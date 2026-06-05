@@ -4,6 +4,7 @@ import {
   SNAPSHOT_READY_MESSAGE,
   saveLatestSnapshot
 } from "../src/capture/snapshotSession";
+import { requestCaptureAccess } from "../src/capture/pageAccess";
 import { collectPageSnapshot } from "../src/extraction/injectedSnapshot";
 import type { PageSnapshot } from "../src/types";
 
@@ -18,7 +19,7 @@ export default defineBackground(() => {
   chrome.action.onClicked.addListener((tab) => {
     if (!tab.id) return;
     void chrome.sidePanel.open({ tabId: tab.id }).catch(() => undefined);
-    void captureTab(tab.id);
+    void captureTab(tab.id, tab.url);
   });
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -33,7 +34,7 @@ async function captureActiveTab(): Promise<{ ok: true } | { ok: false; message: 
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     const tabId = tabs[0]?.id;
     if (!tabId) throw new Error("No active tab is available.");
-    await captureTab(tabId);
+    await captureTab(tabId, tabs[0]?.url);
     return { ok: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not capture the active page.";
@@ -42,8 +43,10 @@ async function captureActiveTab(): Promise<{ ok: true } | { ok: false; message: 
   }
 }
 
-async function captureTab(tabId: number): Promise<void> {
+async function captureTab(tabId: number, url?: string): Promise<void> {
   try {
+    const granted = await requestCaptureAccess(url);
+    if (!granted) throw new Error("Article Ferry needs site access before it can capture this page.");
     const results = (await chrome.scripting.executeScript({
       target: { tabId },
       func: collectPageSnapshot

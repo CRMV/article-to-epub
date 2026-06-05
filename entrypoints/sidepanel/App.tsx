@@ -5,6 +5,7 @@ import {
   isSnapshotMessage,
   loadLatestSnapshot
 } from "../../src/capture/snapshotSession";
+import { requestCaptureAccess } from "../../src/capture/pageAccess";
 import { buildConversionReport } from "../../src/diagnostics/conversionReport";
 import { createEmailHandoff } from "../../src/delivery/emailHandoff";
 import { openAmazonUpload } from "../../src/delivery/amazonUploadHandoff";
@@ -91,6 +92,8 @@ function App() {
     setStatus({ kind: "loading", text: "Refreshing capture..." });
 
     try {
+      const granted = await requestCaptureAccess();
+      if (!granted) throw new Error("Article Ferry needs site access before it can capture this page.");
       const response = (await chrome.runtime.sendMessage({ type: CAPTURE_ACTIVE_TAB_REQUEST })) as
         | { ok: true }
         | { ok: false; message: string };
