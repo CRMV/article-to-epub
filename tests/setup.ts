@@ -14,7 +14,7 @@ if (!globalThis.chrome) {
       runtime: {
         getURL: (path: string) => `chrome-extension://test${path}`,
         onInstalled: { addListener: vi.fn() },
-        onMessage: { addListener: vi.fn() },
+        onMessage: { addListener: vi.fn(), removeListener: vi.fn() },
         sendMessage: vi.fn()
       },
       scripting: { executeScript: vi.fn() },
@@ -25,6 +25,12 @@ if (!globalThis.chrome) {
       },
       storage: {
         local: {
+          get: vi.fn(),
+          set: vi.fn(),
+          remove: vi.fn(),
+          clear: vi.fn()
+        },
+        session: {
           get: vi.fn(),
           set: vi.fn(),
           remove: vi.fn(),

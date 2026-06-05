@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import {
+  CAPTURE_ACTIVE_TAB_REQUEST,
+  isSnapshotMessage,
+  loadLatestSnapshot
+} from "../../src/capture/snapshotSession";
 import { buildConversionReport } from "../../src/diagnostics/conversionReport";
 import { createEmailHandoff } from "../../src/delivery/emailHandoff";
 import { openAmazonUpload } from "../../src/delivery/amazonUploadHandoff";
@@ -8,7 +13,6 @@ import { buildEpub, buildFileName } from "../../src/ebook/epubBuilder";
 import { planImageBudget, type AssetDecision } from "../../src/ebook/imageBudget";
 import { resolveArticleAssets } from "../../src/extraction/assetResolver";
 import { fetchIncludedImageAssets } from "../../src/extraction/fetchImageAssets";
-import { collectPageSnapshot } from "../../src/extraction/injectedSnapshot";
 import { planAssetPermissions, removeAssetOrigins, requestAssetOrigins } from "../../src/extraction/permissionPlanner";
 import { saveSettings, loadSettings } from "../../src/storage/settings";
 import type { DeliveryRoute, ImageMode, PageSnapshot, PreviewModel, ResolvedMetadata } from "../../src/types";
@@ -47,6 +51,25 @@ function App() {
   }, []);
 
   useEffect(() => {
+    void loadLatestSnapshot().then((storedSnapshot) => {
+      if (storedSnapshot) setSnapshot(storedSnapshot);
+    });
+
+    const onMessage = (message: unknown) => {
+      if (!isSnapshotMessage(message)) return;
+      if (message.type === "article-ferry:snapshot-ready") {
+        setSnapshot(message.snapshot);
+        setMetadataEdits({});
+        return;
+      }
+      setStatus({ kind: "error", text: message.message });
+    };
+
+    chrome.runtime.onMessage.addListener(onMessage);
+    return () => chrome.runtime.onMessage.removeListener(onMessage);
+  }, []);
+
+  useEffect(() => {
     if (!snapshot) return;
     const result = buildPreviewFromSnapshot(snapshot, { imageMode, route });
     if (!result.ok) {
@@ -65,22 +88,20 @@ function App() {
   async function captureActiveTab() {
     setBusy(true);
     setGeneratedFileName(undefined);
-    setStatus({ kind: "loading", text: "Capturing the active tab..." });
+    setStatus({ kind: "loading", text: "Refreshing capture..." });
 
     try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      const tabId = tabs[0]?.id;
-      if (!tabId) throw new Error("No active tab is available.");
-      const results = (await chrome.scripting.executeScript({
-        target: { tabId },
-        func: collectPageSnapshot
-      })) as Array<{ result?: PageSnapshot }>;
-      const nextSnapshot = results[0]?.result;
-      if (!nextSnapshot) throw new Error("The active page did not return a snapshot.");
-      setSnapshot(nextSnapshot);
-      setMetadataEdits({});
+      const response = (await chrome.runtime.sendMessage({ type: CAPTURE_ACTIVE_TAB_REQUEST })) as
+        | { ok: true }
+        | { ok: false; message: string };
+      if (!response?.ok) {
+        throw new Error(response?.message ?? "Click the Article Ferry toolbar icon from the article tab to refresh access.");
+      }
     } catch (error) {
-      setStatus({ kind: "error", text: error instanceof Error ? error.message : "Could not capture the active page." });
+      setStatus({
+        kind: "error",
+        text: error instanceof Error ? error.message : "Click the Article Ferry toolbar icon from the article tab to refresh access."
+      });
     } finally {
       setBusy(false);
     }
