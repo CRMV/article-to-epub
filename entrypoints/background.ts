@@ -8,6 +8,13 @@ import { collectPageSnapshot } from "../src/extraction/injectedSnapshot";
 import type { PageSnapshot } from "../src/types";
 
 export default defineBackground(() => {
+  const disableAutomaticPanelOpen = () => {
+    void chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => undefined);
+  };
+
+  chrome.runtime.onInstalled.addListener(disableAutomaticPanelOpen);
+  disableAutomaticPanelOpen();
+
   chrome.action.onClicked.addListener((tab) => {
     if (!tab.id) return;
     void chrome.sidePanel.open({ tabId: tab.id }).catch(() => undefined);
