@@ -17,7 +17,7 @@ import { ConversionReport } from "../../src/ui/components/ConversionReport";
 import { DeliveryPanel } from "../../src/ui/components/DeliveryPanel";
 import { ImageModeControl } from "../../src/ui/components/ImageModeControl";
 import { MetadataEditor } from "../../src/ui/components/MetadataEditor";
-import { buildPreviewFromSnapshot, metadataWithEdits } from "../../src/ui/state/conversionStore";
+import { buildPreviewFromSnapshot, metadataWithEdits, openGraphImageFromSnapshot } from "../../src/ui/state/conversionStore";
 import "./style.css";
 
 type StatusKind = "idle" | "loading" | "ready" | "warning" | "error" | "done";
@@ -95,9 +95,13 @@ function App() {
 
     try {
       await saveSettings({ imageMode, route, ...(kindleEmail ? { kindleEmail } : {}) });
-      const assets = resolveArticleAssets(preview.article);
+      const assets = resolveArticleAssets(preview.article, openGraphImageFromSnapshot(preview.snapshot));
       const decisions = planImageBudget(assets, imageMode, route);
-      const permissionPlan = planAssetPermissions(preview.snapshot.url, decisions.filter((decision) => decision.include).map((decision) => decision.asset.candidate));
+      const plannedImageCount = decisions.filter((decision) => decision.include).length;
+      const permissionPlan = planAssetPermissions(
+        preview.snapshot.url,
+        decisions.filter((decision) => decision.include).map((decision) => decision.asset.candidate)
+      );
       grantedOrigins = permissionPlan.requiredOrigins;
 
       const granted = await requestAssetOrigins(grantedOrigins);
@@ -112,7 +116,12 @@ function App() {
       await downloadEpub(bytes, filename);
       setGeneratedFileName(filename);
       setPreview({ ...preview, metadata: editedMetadata, report });
-      setStatus({ kind: "done", text: granted ? "EPUB downloaded." : "EPUB downloaded without cross-origin images." });
+      setStatus({
+        kind: "done",
+        text: granted
+          ? `EPUB downloaded with ${binaryAssets.length}/${plannedImageCount} planned images.`
+          : "EPUB downloaded without cross-origin images."
+      });
       if (route === "amazon-web") await openAmazonUpload();
     } catch (error) {
       setStatus({ kind: "error", text: error instanceof Error ? error.message : "EPUB generation failed." });
@@ -186,4 +195,3 @@ createRoot(root).render(
 );
 
 export default App;
-

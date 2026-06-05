@@ -21,8 +21,7 @@ export function buildPreviewFromSnapshot(snapshot: PageSnapshot, options: Previe
   }
 
   const metadata = resolveMetadata(snapshot);
-  const openGraphImage = metadata.candidates.canonicalUrl.length > 0 ? undefined : undefined;
-  const assets = resolveArticleAssets(extracted.article, openGraphImage);
+  const assets = resolveArticleAssets(extracted.article, openGraphImageFromSnapshot(snapshot));
   const decisions = planImageBudget(assets, options.imageMode, options.route);
   const report = buildConversionReport(decisions, options.route);
 
@@ -48,3 +47,19 @@ export function metadataWithEdits(metadata: ResolvedMetadata, edits: Partial<Res
   };
 }
 
+export function openGraphImageFromSnapshot(snapshot: PageSnapshot): string | undefined {
+  const document = new DOMParser().parseFromString(snapshot.html, "text/html");
+  const value = document
+    .querySelector<HTMLMetaElement>(
+      'meta[property="og:image"], meta[property="og:image:url"], meta[name="twitter:image"]'
+    )
+    ?.content.trim();
+
+  if (!value) return undefined;
+
+  try {
+    return new URL(value, snapshot.canonicalUrl ?? snapshot.url).toString();
+  } catch {
+    return undefined;
+  }
+}

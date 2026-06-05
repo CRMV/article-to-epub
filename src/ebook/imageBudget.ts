@@ -33,7 +33,6 @@ export function planImageBudget(assets: ResolvedAsset[], mode: ImageMode, route:
     if (asset.classification === "decorative") return skip(asset, "decorative");
     if (mode === "text-only") return skip(asset, "text-only");
     if (mode === "cover-only" && coverIncluded) return skip(asset, "mode-cover-only");
-    if (mode === "cover-only" && asset.classification !== "cover" && coverIncluded) return skip(asset, "mode-cover-only");
     if (used + asset.estimatedBytes > budget) return skip(asset, "size-budget");
 
     used += asset.estimatedBytes;
@@ -49,4 +48,3 @@ export function totalEstimatedBytes(decisions: AssetDecision[], baseBytes = 120_
 function skip(asset: ResolvedAsset, reason: AssetSkipReason): AssetDecision {
   return { asset, include: false, reason };
 }
-

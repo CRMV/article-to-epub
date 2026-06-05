@@ -2,18 +2,11 @@ import type { EpubBinaryAsset } from "../ebook/epubBuilder";
 import type { AssetDecision } from "../ebook/imageBudget";
 
 export async function fetchIncludedImageAssets(decisions: AssetDecision[]): Promise<EpubBinaryAsset[]> {
-  const assets: EpubBinaryAsset[] = [];
-  let index = 1;
-
-  for (const decision of decisions) {
-    if (!decision.include) continue;
-    const fetched = await fetchImage(decision.asset.candidate.url, index);
-    if (!fetched) continue;
-    assets.push(fetched);
-    index += 1;
-  }
-
-  return assets;
+  const included = decisions.filter((decision) => decision.include);
+  const fetched = await Promise.all(
+    included.map((decision, index) => fetchImage(decision.asset.candidate.url, index + 1))
+  );
+  return fetched.filter((asset): asset is EpubBinaryAsset => Boolean(asset));
 }
 
 async function fetchImage(url: string, index: number): Promise<EpubBinaryAsset | undefined> {
@@ -52,4 +45,3 @@ function extensionForMediaType(mediaType: string): string {
   if (mediaType === "image/avif") return "avif";
   return "jpg";
 }
-

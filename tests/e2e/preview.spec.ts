@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { PageSnapshot } from "../../src/types";
-import { buildPreviewFromSnapshot } from "../../src/ui/state/conversionStore";
+import { buildPreviewFromSnapshot, openGraphImageFromSnapshot } from "../../src/ui/state/conversionStore";
 
 describe("preview pipeline", () => {
   it("builds a target-page preview model with metadata and report", () => {
@@ -22,5 +22,16 @@ describe("preview pipeline", () => {
     expect(result.preview.report.hosts).toContain("content.wolfram.com");
     expect(result.preview.article.textContent).toContain("Computational irreducibility");
   });
-});
 
+  it("uses Open Graph image metadata as a cover candidate", () => {
+    const snapshot: PageSnapshot = {
+      mode: "document",
+      url: "https://example.com/articles/test",
+      title: "Cover Fixture",
+      html: '<html><head><meta property="og:image" content="/cover.jpg"></head><body><article><h1>Cover</h1><p>Enough article text to parse.</p></article></body></html>',
+      capturedAt: new Date(0).toISOString()
+    };
+
+    expect(openGraphImageFromSnapshot(snapshot)).toBe("https://example.com/cover.jpg");
+  });
+});
