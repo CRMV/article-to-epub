@@ -1,7 +1,7 @@
 ---
 title: "feat: Build a Kindle-ready article EPUB extension"
 type: feat
-status: active
+status: completed
 date: 2026-06-05
 deepened: 2026-06-05
 ---
