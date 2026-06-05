@@ -21,6 +21,18 @@ npm run verify
 
 The verification command runs TypeScript, unit/component tests, and a Chrome MV3 build.
 
+## Package
+
+```bash
+npm run zip
+```
+
+The zip command creates a reproducible Chrome MV3 package from the current source tree.
+
+## Compatibility Reports
+
+Please use the compatibility issue template and avoid pasting full article bodies or private content. Short snippets, public URLs, screenshots, and conversion-report summaries are enough.
+
 ## Privacy Stance
 
 Article content is processed locally in the browser extension. The MVP has no analytics, no remote crash reporting, no backend, and no automatic diagnostic upload.
@@ -28,4 +40,3 @@ Article content is processed locally in the browser extension. The MVP has no an
 ## Manual Handoff
 
 The extension downloads a generated EPUB. You can then upload that file through Amazon's Send to Kindle web page or send it by email from an approved sender address.
-
