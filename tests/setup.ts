@@ -13,12 +13,14 @@ if (!globalThis.chrome) {
       },
       runtime: {
         getURL: (path: string) => `chrome-extension://test${path}`,
+        onInstalled: { addListener: vi.fn() },
         onMessage: { addListener: vi.fn() },
         sendMessage: vi.fn()
       },
       scripting: { executeScript: vi.fn() },
       sidePanel: {
         open: vi.fn(),
+        setPanelBehavior: vi.fn(),
         setOptions: vi.fn()
       },
       storage: {
@@ -36,4 +38,3 @@ if (!globalThis.chrome) {
     }
   });
 }
-

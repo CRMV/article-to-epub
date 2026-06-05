@@ -1,14 +1,15 @@
 export default defineBackground(() => {
-  chrome.action.onClicked.addListener(async (tab) => {
+  const openPanelFromAction = (tab: chrome.tabs.Tab) => {
     if (!tab.id) return;
+    void chrome.sidePanel.open({ tabId: tab.id }).catch(() => undefined);
+  };
 
-    await chrome.sidePanel.setOptions({
-      tabId: tab.id,
-      path: "sidepanel.html",
-      enabled: true
-    });
+  const enableActionClick = () => {
+    void chrome.sidePanel
+      .setPanelBehavior({ openPanelOnActionClick: true })
+      .catch(() => chrome.action.onClicked.addListener(openPanelFromAction));
+  };
 
-    await chrome.sidePanel.open({ tabId: tab.id });
-  });
+  chrome.runtime.onInstalled.addListener(enableActionClick);
+  enableActionClick();
 });
-
