@@ -1,29 +1,29 @@
 import type { PageSnapshot } from "../types";
 
-function getCanonicalUrl(): string | undefined {
-  const link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  const href = link?.href?.trim();
-  return href || undefined;
-}
-
-function getSelectionHtml(): { html?: string; text?: string } {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return {};
-
-  const container = document.createElement("div");
-  for (let index = 0; index < selection.rangeCount; index += 1) {
-    container.append(selection.getRangeAt(index).cloneContents());
+export function collectPageSnapshot(): PageSnapshot {
+  function getCanonicalUrl(): string | undefined {
+    const link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    const href = link?.href?.trim();
+    return href || undefined;
   }
 
-  const html = container.innerHTML.trim();
-  const text = selection.toString().trim();
-  return {
-    ...(html ? { html } : {}),
-    ...(text ? { text } : {})
-  };
-}
+  function getSelectionHtml(): { html?: string; text?: string } {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return {};
 
-export function collectPageSnapshot(): PageSnapshot {
+    const container = document.createElement("div");
+    for (let index = 0; index < selection.rangeCount; index += 1) {
+      container.append(selection.getRangeAt(index).cloneContents());
+    }
+
+    const html = container.innerHTML.trim();
+    const text = selection.toString().trim();
+    return {
+      ...(html ? { html } : {}),
+      ...(text ? { text } : {})
+    };
+  }
+
   const selection = getSelectionHtml();
   const html = document.documentElement.outerHTML;
   const title = document.title?.trim() || location.hostname;
@@ -42,4 +42,3 @@ export function collectPageSnapshot(): PageSnapshot {
     capturedAt: new Date().toISOString()
   };
 }
-

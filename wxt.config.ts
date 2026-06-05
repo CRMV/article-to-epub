@@ -7,7 +7,6 @@ export default defineConfig({
     short_name: "Article Ferry",
     description: "Convert the current article page into a Kindle-ready EPUB file with local preview and metadata editing.",
     version: "0.1.0",
-    manifest_version: 3,
     action: {
       default_title: "Article Ferry"
     },
@@ -21,4 +20,3 @@ export default defineConfig({
     }
   }
 });
-
