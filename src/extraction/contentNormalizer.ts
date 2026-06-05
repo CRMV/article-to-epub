@@ -6,6 +6,13 @@ const REMOVE_SELECTORS = [
   "noscript",
   "template",
   "iframe",
+  "object",
+  "embed",
+  "source",
+  "track",
+  "link",
+  "meta",
+  "base",
   "form",
   "button",
   "input",
@@ -42,13 +49,16 @@ export function normalizeArticleHtml(html: string, baseUrl: string): Normalizati
 
   for (const element of root.querySelectorAll<HTMLElement>("*")) {
     for (const attribute of Array.from(element.attributes)) {
-      if (attribute.name.toLowerCase().startsWith("on")) {
+      const name = attribute.name.toLowerCase();
+      if (name.startsWith("on") || name === "style" || name === "srcdoc" || name === "poster" || name === "background") {
         element.removeAttribute(attribute.name);
       }
     }
   }
 
   const assets = collectImageCandidates(root, baseUrl);
+  rewriteImageElements(root, baseUrl);
+  sanitizeLinks(root, baseUrl);
   const textContent = (root.textContent ?? "").replace(/\s+/g, " ").trim();
 
   return {
@@ -91,6 +101,51 @@ export function collectImageCandidates(root: ParentNode, baseUrl: string): Asset
   }
 
   return [...candidates.values()];
+}
+
+function rewriteImageElements(root: ParentNode, baseUrl: string): void {
+  for (const image of root.querySelectorAll<HTMLImageElement>("img")) {
+    const candidate = firstPresent(
+      image.getAttribute("src"),
+      image.getAttribute("data-src"),
+      image.dataset.original,
+      largestSrcsetCandidate(image.getAttribute("srcset") ?? image.getAttribute("data-srcset")),
+      linkedImage(image)
+    );
+    const absolute = candidate ? toAbsoluteUrl(candidate, baseUrl) : undefined;
+
+    image.removeAttribute("src");
+    image.removeAttribute("srcset");
+    image.removeAttribute("data-src");
+    image.removeAttribute("data-srcset");
+    image.removeAttribute("data-original");
+
+    if (absolute) {
+      image.setAttribute("data-asset-url", absolute);
+    }
+  }
+}
+
+function sanitizeLinks(root: ParentNode, baseUrl: string): void {
+  for (const anchor of root.querySelectorAll<HTMLAnchorElement>("a[href]")) {
+    const href = anchor.getAttribute("href");
+    const safeHref = href ? safeLinkHref(href, baseUrl) : undefined;
+    if (safeHref) {
+      anchor.setAttribute("href", safeHref);
+      anchor.setAttribute("rel", "noreferrer noopener");
+      continue;
+    }
+    anchor.removeAttribute("href");
+  }
+}
+
+function safeLinkHref(rawHref: string, baseUrl: string): string | undefined {
+  try {
+    const url = new URL(rawHref, baseUrl);
+    return url.protocol === "http:" || url.protocol === "https:" || url.protocol === "mailto:" ? url.toString() : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function firstPresent(...values: Array<string | null | undefined>): string | undefined {

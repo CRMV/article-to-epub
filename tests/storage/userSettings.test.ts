@@ -30,10 +30,18 @@ describe("user settings", () => {
     expect(chrome.storage.local.remove).toHaveBeenCalledWith("settings");
   });
 
+  it("falls back to defaults for invalid stored settings", async () => {
+    await chrome.storage.local.set({ settings: { imageMode: "all-images", route: "smtp", kindleEmail: " reader@kindle.com " } });
+
+    await expect(loadSettings()).resolves.toEqual({
+      ...defaultSettings,
+      kindleEmail: "reader@kindle.com"
+    });
+  });
+
   it("validates and masks Kindle targets", () => {
     expect(isValidKindleEmail("reader@kindle.com")).toBe(true);
     expect(isValidKindleEmail("reader@example.com")).toBe(false);
     expect(maskEmail("reader@kindle.com")).toBe("re****@kindle.com");
   });
 });
-

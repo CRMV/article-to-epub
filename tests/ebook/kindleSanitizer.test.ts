@@ -14,5 +14,15 @@ describe("sanitizeForEpub", () => {
   it("wraps content in an XHTML document", () => {
     expect(wrapXhtmlDocument("Title", "<p>Hello</p>")).toContain('xmlns="http://www.w3.org/1999/xhtml"');
   });
-});
 
+  it("rewrites packaged image markers to local XHTML image sources", () => {
+    const html = sanitizeForEpub(
+      '<p>Hello<br>reader</p><img data-asset-url="https://example.com/image.jpg" alt="Diagram">',
+      new Map([["https://example.com/image.jpg", "../images/image-1.jpg"]])
+    );
+
+    expect(html).toContain('src="../images/image-1.jpg"');
+    expect(html).not.toContain("data-asset-url");
+    expect(new DOMParser().parseFromString(`<article>${html}</article>`, "application/xml").querySelector("parsererror")).toBeNull();
+  });
+});

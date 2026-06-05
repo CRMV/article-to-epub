@@ -44,6 +44,7 @@ export function unsafeReason(rawUrl: string): string | undefined {
 
   if (url.protocol !== "http:" && url.protocol !== "https:") return "unsupported-scheme";
   if (isLocalOrPrivateHost(url.hostname)) return "private-address";
+  if (url.protocol === "http:") return "insecure-http";
   return undefined;
 }
 
@@ -63,4 +64,3 @@ function isLocalOrPrivateHost(hostname: string): boolean {
   const [a, b] = parts as [number, number, number, number];
   return a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a === 127 || a === 169 && b === 254;
 }
-

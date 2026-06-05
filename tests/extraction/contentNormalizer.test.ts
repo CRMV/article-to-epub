@@ -24,6 +24,21 @@ describe("normalizeArticleHtml", () => {
     expect(result.assets.map((asset) => asset.url)).toContain("https://example.com/small.jpg");
     expect(result.assets.map((asset) => asset.url)).toContain("https://example.com/large.jpg");
     expect(result.assets[0]?.caption).toBe("A useful diagram.");
+    expect(result.html).toContain('data-asset-url="https://example.com/small.jpg"');
+    expect(result.html).not.toContain("srcset");
+    expect(result.html).not.toContain('src="/small.jpg"');
+  });
+
+  it("strips preview-loading URLs and unsafe link protocols", () => {
+    const result = normalizeArticleHtml(
+      '<p style="background:url(https://tracker.example/pixel)">Hello <a href="javascript:alert(1)">bad</a><img src="https://cdn.example.net/a.jpg" /></p><object data="https://example.com/file"></object>',
+      "https://example.com/post"
+    );
+
+    expect(result.html).not.toContain("style=");
+    expect(result.html).not.toContain("javascript:");
+    expect(result.html).not.toContain("object");
+    expect(result.html).not.toContain('src="https://cdn.example.net/a.jpg"');
+    expect(result.html).toContain('data-asset-url="https://cdn.example.net/a.jpg"');
   });
 });
-

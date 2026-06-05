@@ -1,3 +1,5 @@
+import { serializeXhtmlChildren } from "./xhtmlSerializer";
+
 export interface TocEntry {
   id: string;
   level: number;
@@ -38,7 +40,7 @@ export function addHeadingIds(contentHtml: string): { html: string; toc: TocEntr
     toc.push({ id, level, label });
   }
 
-  return { html: root.innerHTML, toc };
+  return { html: serializeXhtmlChildren(root), toc };
 }
 
 function slugify(value: string): string {
@@ -59,4 +61,3 @@ function uniqueId(base: string, used: Set<string>): string {
   used.add(id);
   return id;
 }
-

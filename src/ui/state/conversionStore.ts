@@ -39,11 +39,17 @@ export function buildPreviewFromSnapshot(snapshot: PageSnapshot, options: Previe
 }
 
 export function metadataWithEdits(metadata: ResolvedMetadata, edits: Partial<ResolvedMetadata>): ResolvedMetadata {
+  const explicitEdits = Object.fromEntries(
+    Object.entries(edits).filter((entry): entry is [keyof ResolvedMetadata, string] => typeof entry[1] === "string")
+  );
+  const merged = { ...metadata, ...explicitEdits };
+
+  if (!merged.title?.trim()) {
+    merged.title = metadata.title ?? "Untitled Article";
+  }
+
   return {
-    ...metadata,
-    ...Object.fromEntries(
-      Object.entries(edits).filter(([, value]) => typeof value === "string" && value.trim().length > 0)
-    )
+    ...merged
   };
 }
 

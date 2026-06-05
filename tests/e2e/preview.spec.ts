@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { PageSnapshot } from "../../src/types";
-import { buildPreviewFromSnapshot, openGraphImageFromSnapshot } from "../../src/ui/state/conversionStore";
+import { buildPreviewFromSnapshot, metadataWithEdits, openGraphImageFromSnapshot } from "../../src/ui/state/conversionStore";
 
 describe("preview pipeline", () => {
   it("builds a target-page preview model with metadata and report", () => {
@@ -33,5 +33,19 @@ describe("preview pipeline", () => {
     };
 
     expect(openGraphImageFromSnapshot(snapshot)).toBe("https://example.com/cover.jpg");
+  });
+
+  it("preserves explicit blank metadata edits except for required title fallback", () => {
+    const metadata = {
+      title: "Original title",
+      author: "Original author",
+      candidates: { title: [], author: [], source: [], publishedDate: [], language: [], canonicalUrl: [] },
+      warnings: []
+    };
+
+    expect(metadataWithEdits(metadata, { title: "", author: "" })).toMatchObject({
+      title: "Original title",
+      author: ""
+    });
   });
 });

@@ -5,7 +5,7 @@ import { createEmailHandoff } from "../../src/delivery/emailHandoff";
 import { openAmazonUpload } from "../../src/delivery/amazonUploadHandoff";
 import { downloadEpub } from "../../src/delivery/downloadArticle";
 import { buildEpub, buildFileName } from "../../src/ebook/epubBuilder";
-import { planImageBudget } from "../../src/ebook/imageBudget";
+import { planImageBudget, type AssetDecision } from "../../src/ebook/imageBudget";
 import { resolveArticleAssets } from "../../src/extraction/assetResolver";
 import { fetchIncludedImageAssets } from "../../src/extraction/fetchImageAssets";
 import { collectPageSnapshot } from "../../src/extraction/injectedSnapshot";
@@ -94,7 +94,6 @@ function App() {
     let grantedOrigins: string[] = [];
 
     try {
-      await saveSettings({ imageMode, route, ...(kindleEmail ? { kindleEmail } : {}) });
       const assets = resolveArticleAssets(preview.article, openGraphImageFromSnapshot(preview.snapshot));
       const decisions = planImageBudget(assets, imageMode, route);
       const plannedImageCount = decisions.filter((decision) => decision.include).length;
@@ -105,8 +104,12 @@ function App() {
       grantedOrigins = permissionPlan.requiredOrigins;
 
       const granted = await requestAssetOrigins(grantedOrigins);
-      const binaryAssets = granted ? await fetchIncludedImageAssets(decisions) : [];
-      const report = buildConversionReport(decisions, route);
+      await saveSettings({ imageMode, route, ...(kindleEmail ? { kindleEmail } : {}) });
+      const fetchableDecisions = granted
+        ? decisions
+        : decisions.filter((decision) => decision.include && !requiresOptionalImagePermission(preview.snapshot.url, decision));
+      const binaryAssets = await fetchIncludedImageAssets(fetchableDecisions);
+      const report = buildConversionReport(reconcileImageDecisions(decisions, binaryAssets, granted, preview.snapshot.url), route);
       const bytes = await buildEpub({
         article: preview.article,
         metadata: editedMetadata,
@@ -126,7 +129,30 @@ function App() {
     } catch (error) {
       setStatus({ kind: "error", text: error instanceof Error ? error.message : "EPUB generation failed." });
     } finally {
-      if (grantedOrigins.length > 0) void removeAssetOrigins(grantedOrigins);
+      if (grantedOrigins.length > 0) {
+        try {
+          const removed = await removeAssetOrigins(grantedOrigins);
+          if (!removed) {
+            setStatus((current) =>
+              current.kind === "done"
+                ? {
+                    kind: "warning",
+                    text: `${current.text} Image host permission cleanup was not confirmed.`
+                  }
+                : current
+            );
+          }
+        } catch {
+          setStatus((current) =>
+            current.kind === "done"
+              ? {
+                  kind: "warning",
+                  text: `${current.text} Image host permission cleanup failed.`
+                }
+              : current
+          );
+        }
+      }
       setBusy(false);
     }
   }
@@ -195,3 +221,35 @@ createRoot(root).render(
 );
 
 export default App;
+
+function requiresOptionalImagePermission(pageUrl: string, decision: AssetDecision): boolean {
+  if (!decision.include) return false;
+  try {
+    const pageOrigin = new URL(pageUrl).origin;
+    const asset = new URL(decision.asset.candidate.url);
+    return asset.protocol === "https:" && asset.origin !== pageOrigin;
+  } catch {
+    return false;
+  }
+}
+
+function reconcileImageDecisions(
+  decisions: AssetDecision[],
+  assets: Array<{ originalUrl: string }>,
+  optionalPermissionGranted: boolean,
+  pageUrl: string
+): AssetDecision[] {
+  const fetchedUrls = new Set(assets.map((asset) => asset.originalUrl));
+
+  return decisions.map((decision) => {
+    if (!decision.include || fetchedUrls.has(decision.asset.candidate.url)) return decision;
+    return {
+      ...decision,
+      include: false,
+      reason:
+        !optionalPermissionGranted && requiresOptionalImagePermission(pageUrl, decision)
+          ? "permission-denied"
+          : "fetch-failed"
+    };
+  });
+}

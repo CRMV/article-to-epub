@@ -1,7 +1,16 @@
+import { serializeXhtmlChildren } from "./xhtmlSerializer";
+
 const REMOVE_SELECTORS = [
   "script",
   "style",
   "iframe",
+  "object",
+  "embed",
+  "source",
+  "track",
+  "link",
+  "meta",
+  "base",
   "form",
   "button",
   "input",
@@ -32,10 +41,12 @@ export function sanitizeForEpub(contentHtml: string, assetHrefByUrl = new Map<st
   }
 
   for (const image of root.querySelectorAll<HTMLImageElement>("img")) {
-    const src = image.getAttribute("src") ?? "";
+    const src = image.getAttribute("data-asset-url") ?? image.getAttribute("src") ?? "";
     const href = assetHrefByUrl.get(src);
     if (href) {
       image.setAttribute("src", href);
+      image.removeAttribute("data-asset-url");
+      image.removeAttribute("srcset");
       continue;
     }
 
@@ -46,7 +57,7 @@ export function sanitizeForEpub(contentHtml: string, assetHrefByUrl = new Map<st
     image.replaceWith(replacement);
   }
 
-  return root.innerHTML.trim();
+  return serializeXhtmlChildren(root).trim();
 }
 
 export function wrapXhtmlDocument(title: string, bodyHtml: string): string {
@@ -72,4 +83,3 @@ export function escapeXml(value: string): string {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
 }
-

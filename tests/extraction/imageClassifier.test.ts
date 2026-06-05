@@ -12,6 +12,10 @@ describe("classifyImage", () => {
     expect(unsafeReason("chrome://extensions/icon.png")).toBe("unsupported-scheme");
   });
 
+  it("marks public http images unsafe because optional permissions are https-only", () => {
+    expect(unsafeReason("http://example.com/image.png")).toBe("insecure-http");
+  });
+
   it("classifies useful images as meaningful", () => {
     expect(
       classifyImage({
@@ -35,4 +39,3 @@ describe("classifyImage", () => {
     ).toBe("decorative");
   });
 });
-

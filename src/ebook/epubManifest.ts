@@ -20,11 +20,11 @@ export function containerXml(): string {
 }
 
 export function packageOpf(metadata: ResolvedMetadata, assets: ManifestAsset[]): string {
-  const title = metadata.title ?? "Untitled Article";
+  const title = metadata.title?.trim() || "Untitled Article";
   const identifier = stableIdentifier(metadata.canonicalUrl ?? title);
-  const author = metadata.author ?? "Unknown Author";
-  const language = metadata.language ?? "en";
-  const date = metadata.publishedDate ?? new Date().toISOString().slice(0, 10);
+  const author = metadata.author?.trim() || "Unknown Author";
+  const language = metadata.language?.trim() || "en";
+  const date = metadata.publishedDate?.trim() || new Date().toISOString().slice(0, 10);
   const assetItems = assets
     .map((asset) => `    <item id="${asset.id}" href="${asset.href}" media-type="${asset.mediaType}"${asset.properties ? ` properties="${asset.properties}"` : ""} />`)
     .join("\n");
@@ -37,8 +37,8 @@ export function packageOpf(metadata: ResolvedMetadata, assets: ManifestAsset[]):
     <dc:creator>${escapeXml(author)}</dc:creator>
     <dc:language>${escapeXml(language)}</dc:language>
     <dc:date>${escapeXml(date)}</dc:date>
-    ${metadata.source ? `<dc:publisher>${escapeXml(metadata.source)}</dc:publisher>` : ""}
-    ${metadata.canonicalUrl ? `<dc:source>${escapeXml(metadata.canonicalUrl)}</dc:source>` : ""}
+    ${metadata.source?.trim() ? `<dc:publisher>${escapeXml(metadata.source)}</dc:publisher>` : ""}
+    ${metadata.canonicalUrl?.trim() ? `<dc:source>${escapeXml(metadata.canonicalUrl)}</dc:source>` : ""}
     <meta property="dcterms:modified">${new Date().toISOString().replace(/\.\d{3}Z$/, "Z")}</meta>
   </metadata>
   <manifest>
@@ -101,4 +101,3 @@ function stableIdentifier(seed: string): string {
   }
   return `article-ferry-${hash.toString(16)}`;
 }
-

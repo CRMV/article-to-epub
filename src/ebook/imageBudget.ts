@@ -7,7 +7,9 @@ export type AssetSkipReason =
   | "decorative"
   | "unsupported-type"
   | "unsafe"
-  | "size-budget";
+  | "size-budget"
+  | "fetch-failed"
+  | "permission-denied";
 
 export interface AssetDecision {
   asset: ResolvedAsset;

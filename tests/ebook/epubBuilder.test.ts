@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import { describe, expect, it } from "vitest";
 import { buildEpub, buildFileName } from "../../src/ebook/epubBuilder";
+import { normalizeArticleHtml } from "../../src/extraction/contentNormalizer";
 import type { NormalizedArticle, ResolvedMetadata } from "../../src/types";
 
 const article: NormalizedArticle = {
@@ -50,11 +51,43 @@ describe("buildEpub", () => {
     await expect(zip.file("OEBPS/package.opf")?.async("string")).resolves.toContain("<dc:creator>Avery Stone</dc:creator>");
     await expect(zip.file("OEBPS/nav.xhtml")?.async("string")).resolves.toContain("First Section");
     await expect(zip.file("OEBPS/text/article.xhtml")?.async("string")).resolves.toContain("../images/image-1.jpg");
+    const articleXhtml = await zip.file("OEBPS/text/article.xhtml")?.async("string");
+    expect(articleXhtml).toBeTruthy();
+    const xml = new DOMParser().parseFromString(articleXhtml ?? "", "application/xml");
+    expect(xml.querySelector("parsererror")).toBeNull();
     expect(zip.file("OEBPS/images/image-1.jpg")).toBeTruthy();
+  });
+
+  it("embeds normalized relative article images using local EPUB hrefs", async () => {
+    const normalized = normalizeArticleHtml(
+      '<h2>Images</h2><p>Body<br>line</p><img src="/images/diagram.jpg" alt="Diagram">',
+      "https://example.com/articles/post"
+    );
+    const bytes = await buildEpub({
+      article: {
+        ...article,
+        contentHtml: normalized.html,
+        assets: normalized.assets
+      },
+      metadata,
+      assets: [
+        {
+          originalUrl: "https://example.com/images/diagram.jpg",
+          href: "images/image-1.jpg",
+          mediaType: "image/jpeg",
+          data: new Uint8Array([1, 2, 3])
+        }
+      ]
+    });
+    const zip = await JSZip.loadAsync(bytes);
+    const articleXhtml = await zip.file("OEBPS/text/article.xhtml")?.async("string");
+
+    expect(articleXhtml).toContain("../images/image-1.jpg");
+    expect(articleXhtml).not.toContain("Image skipped");
+    expect(new DOMParser().parseFromString(articleXhtml ?? "", "application/xml").querySelector("parsererror")).toBeNull();
   });
 
   it("builds clean filenames from edited metadata", () => {
     expect(buildFileName(metadata)).toBe("readable-article__avery-stone__2026-06-05.epub");
   });
 });
-
