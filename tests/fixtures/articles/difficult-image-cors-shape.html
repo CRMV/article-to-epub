@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Difficult Image Fixture</title>
+    <meta property="og:image" content="https://cdn.example.net/cover.jpg?tracking=secret" />
+  </head>
+  <body>
+    <article>
+      <h1>Difficult Image Fixture</h1>
+      <p>This fixture mixes useful, unsafe, unsupported, and cross-origin image URLs.</p>
+      <figure>
+        <img src="https://cdn.example.net/useful-diagram.jpg?token=secret" alt="Useful diagram" width="1200" height="800" />
+        <figcaption>A useful diagram hosted on a CDN.</figcaption>
+      </figure>
+      <img src="http://127.0.0.1/private.png" alt="Private network image" />
+      <img src="https://cdn.example.net/vector.svg" alt="Unsupported vector" />
+      <img src="/pixel.png" width="1" height="1" />
+    </article>
+  </body>
+</html>
+
