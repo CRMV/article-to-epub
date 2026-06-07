@@ -1,20 +1,27 @@
-import type { AssetCandidate, NormalizedArticle } from "../types";
+import type { AssetCandidate, NormalizedArticle, PageSnapshot } from "../types";
 import { classifyImage, type ClassifiedAsset } from "./imageClassifier";
+import { isRecipeExcludedAsset, recipeAssetScore } from "./siteRecipes";
 
 export interface ResolvedAsset extends ClassifiedAsset {
   estimatedBytes: number;
+  recipeExcluded?: boolean;
 }
 
-export function resolveArticleAssets(article: NormalizedArticle, openGraphImage?: string): ResolvedAsset[] {
+export function resolveArticleAssets(article: NormalizedArticle, openGraphImage?: string, snapshot?: PageSnapshot): ResolvedAsset[] {
   const candidates = dedupeAssets([
     ...(openGraphImage ? [{ url: openGraphImage, source: "open-graph" as const }] : []),
     ...article.assets
   ]);
 
-  return candidates.map((candidate) => ({
-    ...classifyImage(candidate),
-    estimatedBytes: estimateImageBytes(candidate)
-  }));
+  return candidates
+    .map((candidate) => ({
+      ...classifyImage(candidate),
+      estimatedBytes: estimateImageBytes(candidate),
+      ...(snapshot && isRecipeExcludedAsset(snapshot, candidate) ? { recipeExcluded: true } : {}),
+      recipeScore: snapshot ? recipeAssetScore(snapshot, candidate) : 0
+    }))
+    .sort((a, b) => b.recipeScore - a.recipeScore)
+    .map(({ recipeScore: _recipeScore, ...asset }) => asset);
 }
 
 export function estimateImageBytes(candidate: AssetCandidate): number {
@@ -35,4 +42,3 @@ function dedupeAssets(candidates: AssetCandidate[]): AssetCandidate[] {
     return true;
   });
 }
-

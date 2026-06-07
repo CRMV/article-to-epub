@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import type { NormalizedArticle, ResolvedMetadata } from "../types";
+import type { KindleProfile, NormalizedArticle, ResolvedMetadata } from "../types";
 import { containerXml, navXhtml, packageOpf, stylesheet, type ManifestAsset } from "./epubManifest";
 import { sanitizeForEpub, wrapXhtmlDocument } from "./kindleSanitizer";
 import { addHeadingIds } from "./tocBuilder";
@@ -49,17 +49,28 @@ export async function buildEpub(input: BuildEpubInput): Promise<Uint8Array> {
   });
 }
 
-export function buildFileName(metadata: ResolvedMetadata): string {
-  const pieces = [metadata.title ?? "article", metadata.author, metadata.publishedDate]
+export function buildFileName(metadata: ResolvedMetadata, pattern: KindleProfile["filenamePattern"] = "standard"): string {
+  const maxBasenameLength = 180;
+  const pieces = filenamePieces(metadata, pattern)
     .filter((piece): piece is string => Boolean(piece?.trim()))
     .map((piece) =>
       piece
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")
+        .slice(0, 80)
+        .replace(/-$/g, "")
     )
     .filter(Boolean);
-  return `${pieces.join("__") || "article"}.epub`;
+  const basename = (pieces.join("__") || "article").slice(0, maxBasenameLength).replace(/[-_]+$/g, "") || "article";
+  return `${basename}.epub`;
+}
+
+function filenamePieces(metadata: ResolvedMetadata, pattern: KindleProfile["filenamePattern"]): Array<string | undefined> {
+  if (pattern === "source-title") return [metadata.source, metadata.title ?? "article", metadata.publishedDate];
+  if (pattern === "date-title") return [metadata.publishedDate, metadata.title ?? "article", metadata.author];
+
+  return [metadata.title ?? "article", metadata.author, metadata.publishedDate];
 }
 
 function escapeHtml(value: string): string {
@@ -68,4 +79,3 @@ function escapeHtml(value: string): string {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
 }
-

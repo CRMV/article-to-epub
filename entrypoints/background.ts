@@ -4,7 +4,7 @@ import {
   SNAPSHOT_READY_MESSAGE,
   saveLatestSnapshot
 } from "../src/capture/snapshotSession";
-import { requestCaptureAccess } from "../src/capture/pageAccess";
+import { releaseCaptureAccess, requestCaptureAccess, type CaptureAccessResult } from "../src/capture/pageAccess";
 import { collectPageSnapshot } from "../src/extraction/injectedSnapshot";
 import type { PageSnapshot } from "../src/types";
 
@@ -44,9 +44,10 @@ async function captureActiveTab(): Promise<{ ok: true } | { ok: false; message: 
 }
 
 async function captureTab(tabId: number, url?: string): Promise<void> {
+  let access: CaptureAccessResult | undefined;
   try {
-    const granted = await requestCaptureAccess(url);
-    if (!granted) throw new Error("Article Ferry needs site access before it can capture this page.");
+    access = await requestCaptureAccess(url);
+    if (!access.granted) throw new Error("Article Ferry needs site access before it can capture this page.");
     const results = (await chrome.scripting.executeScript({
       target: { tabId },
       func: collectPageSnapshot
@@ -62,6 +63,8 @@ async function captureTab(tabId: number, url?: string): Promise<void> {
       .catch(() => undefined);
   } catch (error) {
     await publishCaptureError(error instanceof Error ? error.message : "Could not capture the active page.");
+  } finally {
+    if (access) await releaseCaptureAccess(access).catch(() => undefined);
   }
 }
 

@@ -63,6 +63,51 @@ export type ImageMode = "text-only" | "cover-only" | "smart-images";
 
 export type DeliveryRoute = "download" | "amazon-web" | "email-handoff";
 
+export type PreviewStageName =
+  | "capture"
+  | "extraction"
+  | "metadata"
+  | "asset-plan"
+  | "permission-preflight"
+  | "route-diagnostics"
+  | "generation";
+
+export type PreviewStageStatus = "idle" | "loading" | "ready" | "pending" | "stale" | "error" | "blocked";
+
+export interface PreviewStage {
+  name: PreviewStageName;
+  status: PreviewStageStatus;
+  message: string;
+  startedAt?: string;
+  completedAt?: string;
+  durationMs?: number;
+}
+
+export interface PreviewTimingMark {
+  stage: PreviewStageName | "download" | "delivery-handoff";
+  label: string;
+  at: string;
+  durationMs?: number;
+}
+
+export interface PermissionPreflight {
+  requiredOrigins: string[];
+  grantedOrigins: string[];
+  missingOrigins: string[];
+  checkedAt: string;
+}
+
+export type KindleProfileId = "default" | "fast-email" | "rich-web-upload" | "local-epub-only" | "image-heavy";
+
+export interface KindleProfile {
+  id: KindleProfileId;
+  name: string;
+  description: string;
+  route: DeliveryRoute;
+  imageMode: ImageMode;
+  filenamePattern: "standard" | "source-title" | "date-title";
+}
+
 export interface ConversionWarning {
   severity: "blocking" | "warning" | "notice" | "diagnostic";
   code: string;
@@ -85,5 +130,10 @@ export interface PreviewModel {
   imageMode: ImageMode;
   route: DeliveryRoute;
   report: ConversionReport;
+  profileId?: KindleProfileId;
+  generatedFileName?: string;
+  stages?: PreviewStage[];
+  timings?: PreviewTimingMark[];
+  permissionPreflight?: PermissionPreflight;
+  recipeIds?: string[];
 }
-

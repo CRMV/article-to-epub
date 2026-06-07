@@ -29,6 +29,19 @@ export async function requestAssetOrigins(origins: string[]): Promise<boolean> {
   });
 }
 
+export async function checkAssetOriginGrants(origins: string[]): Promise<string[]> {
+  const granted: string[] = [];
+
+  for (const origin of origins) {
+    const ok = await chrome.permissions.contains({
+      origins: [`${origin}/*`]
+    });
+    if (ok) granted.push(origin);
+  }
+
+  return granted;
+}
+
 export async function removeAssetOrigins(origins: string[]): Promise<boolean> {
   if (origins.length === 0) return true;
   return chrome.permissions.remove({
@@ -43,4 +56,3 @@ function safeOrigin(rawUrl: string): string | undefined {
     return undefined;
   }
 }
-

@@ -39,6 +39,24 @@ describe("user settings", () => {
     });
   });
 
+  it("drops invalid Kindle email and profile settings on load", async () => {
+    await chrome.storage.local.set({
+      settings: {
+        imageMode: "cover-only",
+        route: "email-handoff",
+        selectedProfileId: "missing-profile",
+        profileOverrides: { route: "smtp" },
+        kindleEmail: "not a kindle target"
+      }
+    });
+
+    await expect(loadSettings()).resolves.toEqual({
+      ...defaultSettings,
+      imageMode: "cover-only",
+      route: "email-handoff"
+    });
+  });
+
   it("validates and masks Kindle targets", () => {
     expect(isValidKindleEmail("reader@kindle.com")).toBe(true);
     expect(isValidKindleEmail("reader@example.com")).toBe(false);

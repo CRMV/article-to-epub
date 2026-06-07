@@ -89,5 +89,20 @@ describe("buildEpub", () => {
 
   it("builds clean filenames from edited metadata", () => {
     expect(buildFileName(metadata)).toBe("readable-article__avery-stone__2026-06-05.epub");
+    expect(buildFileName(metadata, "source-title")).toBe("example-daily__readable-article__2026-06-05.epub");
+    expect(buildFileName(metadata, "date-title")).toBe("2026-06-05__readable-article__avery-stone.epub");
+  });
+
+  it("caps pathological filename metadata", () => {
+    const longMetadata = {
+      ...metadata,
+      title: "A".repeat(10_000),
+      source: "Source".repeat(1000),
+      author: "Author".repeat(1000)
+    };
+
+    const filename = buildFileName(longMetadata, "source-title");
+    expect(filename.endsWith(".epub")).toBe(true);
+    expect(filename.length).toBeLessThanOrEqual(185);
   });
 });

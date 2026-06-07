@@ -2,11 +2,13 @@ import type { MetadataCandidate, MetadataField, PageSnapshot, ResolvedMetadata }
 import { buildAuthorCandidates } from "./authorCandidates";
 import { buildDateCandidates } from "./dateCandidates";
 import { extractMetadataSources, firstMeta } from "./metadataSources";
+import { buildRecipeMetadataCandidates } from "./siteRecipes";
 
 const fields: MetadataField[] = ["title", "author", "source", "publishedDate", "language", "canonicalUrl"];
 
 export function resolveMetadata(snapshot: PageSnapshot): ResolvedMetadata {
   const sources = extractMetadataSources(snapshot);
+  const recipeCandidates = buildRecipeMetadataCandidates(snapshot, sources.document);
   const titleCandidates = buildTitleCandidates(snapshot, sources.title);
   const authorCandidates = buildAuthorCandidates(sources);
   const dateCandidates = buildDateCandidates(sources);
@@ -15,10 +17,10 @@ export function resolveMetadata(snapshot: PageSnapshot): ResolvedMetadata {
   const canonicalCandidates = buildSimpleCandidates("canonicalUrl", sources.canonicalUrl ?? snapshot.url, "canonical URL", 0.76);
 
   const candidates: Record<MetadataField, MetadataCandidate[]> = {
-    title: titleCandidates,
-    author: authorCandidates,
-    source: sourceCandidates,
-    publishedDate: dateCandidates,
+    title: mergeCandidates("title", titleCandidates, recipeCandidates),
+    author: mergeCandidates("author", authorCandidates, recipeCandidates),
+    source: mergeCandidates("source", sourceCandidates, recipeCandidates),
+    publishedDate: mergeCandidates("publishedDate", dateCandidates, recipeCandidates),
     language: languageCandidates,
     canonicalUrl: canonicalCandidates
   };
@@ -42,6 +44,14 @@ export function resolveMetadata(snapshot: PageSnapshot): ResolvedMetadata {
     candidates,
     warnings
   };
+}
+
+function mergeCandidates(
+  field: MetadataField,
+  normalCandidates: MetadataCandidate[],
+  recipeCandidates: MetadataCandidate[]
+): MetadataCandidate[] {
+  return dedupe([...recipeCandidates.filter((candidate) => candidate.field === field), ...normalCandidates]);
 }
 
 function buildTitleCandidates(snapshot: PageSnapshot, documentTitle: string): MetadataCandidate[] {

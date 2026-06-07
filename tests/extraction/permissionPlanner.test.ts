@@ -1,30 +1,31 @@
-import { describe, expect, it, vi, type Mock } from "vitest";
-import { planAssetPermissions, removeAssetOrigins, requestAssetOrigins } from "../../src/extraction/permissionPlanner";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import { checkAssetOriginGrants, planAssetPermissions } from "../../src/extraction/permissionPlanner";
 
-describe("permissionPlanner", () => {
-  it("plans only cross-origin https assets", () => {
-    const plan = planAssetPermissions("https://article.example/post", [
-      { url: "https://article.example/image.jpg", source: "img-src" },
-      { url: "https://cdn.example.net/image.jpg", source: "img-src" },
-      { url: "http://cdn.example.net/image.jpg", source: "img-src" }
+describe("permission planner", () => {
+  beforeEach(() => {
+    (chrome.permissions.contains as unknown as Mock).mockReset();
+    (chrome.permissions.request as unknown as Mock).mockReset();
+  });
+
+  it("plans only cross-origin https image hosts", () => {
+    const plan = planAssetPermissions("https://example.com/article", [
+      { url: "https://example.com/a.jpg", source: "img-src" },
+      { url: "https://cdn.example.net/a.jpg", source: "img-src" },
+      { url: "http://cdn.example.net/a.jpg", source: "img-src" }
     ]);
 
     expect(plan.requiredOrigins).toEqual(["https://cdn.example.net"]);
     expect(plan.optionalHostPatterns).toEqual(["https://cdn.example.net/*"]);
   });
 
-  it("requests and removes host permissions with explicit origins", async () => {
-    const permissions = chrome.permissions as unknown as {
-      request: Mock;
-      remove: Mock;
-    };
-    permissions.request.mockResolvedValue(true);
-    permissions.remove.mockResolvedValue(true);
+  it("checks current grants without prompting", async () => {
+    (chrome.permissions.contains as unknown as Mock).mockImplementation(async ({ origins }: { origins: string[] }) =>
+      origins.includes("https://granted.example/*")
+    );
 
-    await expect(requestAssetOrigins(["https://cdn.example.net"])).resolves.toBe(true);
-    await expect(removeAssetOrigins(["https://cdn.example.net"])).resolves.toBe(true);
-
-    expect(chrome.permissions.request).toHaveBeenCalledWith({ origins: ["https://cdn.example.net/*"] });
-    expect(chrome.permissions.remove).toHaveBeenCalledWith({ origins: ["https://cdn.example.net/*"] });
+    await expect(checkAssetOriginGrants(["https://granted.example", "https://missing.example"])).resolves.toEqual([
+      "https://granted.example"
+    ]);
+    expect(chrome.permissions.request).not.toHaveBeenCalled();
   });
 });

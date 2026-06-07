@@ -5,6 +5,9 @@ describe("classifyImage", () => {
   it("marks private addresses as unsafe", () => {
     expect(unsafeReason("http://127.0.0.1/private.png")).toBe("private-address");
     expect(unsafeReason("http://192.168.1.3/private.png")).toBe("private-address");
+    expect(unsafeReason("https://router.lan/private.png")).toBe("private-address");
+    expect(unsafeReason("https://nas.local/private.png")).toBe("private-address");
+    expect(unsafeReason("https://printer/private.png")).toBe("private-address");
   });
 
   it("rejects unsupported schemes", () => {

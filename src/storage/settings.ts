@@ -1,8 +1,11 @@
-import type { DeliveryRoute, ImageMode } from "../types";
+import type { DeliveryRoute, ImageMode, KindleProfileId } from "../types";
+import { defaultProfileId, isKindleProfileId } from "./kindleProfiles";
+import { isValidKindleEmail } from "./kindleTargets";
 
 export interface UserSettings {
   imageMode: ImageMode;
   route: DeliveryRoute;
+  selectedProfileId?: KindleProfileId;
   kindleEmail?: string;
 }
 
@@ -10,7 +13,8 @@ const SETTINGS_KEY = "settings";
 
 export const defaultSettings: UserSettings = {
   imageMode: "smart-images",
-  route: "amazon-web"
+  route: "amazon-web",
+  selectedProfileId: defaultProfileId
 };
 
 export async function loadSettings(): Promise<UserSettings> {
@@ -36,7 +40,10 @@ function parseSettings(value: unknown): UserSettings {
   return {
     imageMode: parseImageMode(value.imageMode),
     route: parseRoute(value.route),
-    ...(typeof value.kindleEmail === "string" && value.kindleEmail.trim() ? { kindleEmail: value.kindleEmail.trim() } : {})
+    selectedProfileId: isKindleProfileId(value.selectedProfileId) ? value.selectedProfileId : defaultProfileId,
+    ...(typeof value.kindleEmail === "string" && isValidKindleEmail(value.kindleEmail.trim())
+      ? { kindleEmail: value.kindleEmail.trim() }
+      : {})
   };
 }
 

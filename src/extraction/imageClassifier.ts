@@ -56,8 +56,10 @@ function isLikelyDecorative(candidate: AssetCandidate): boolean {
 }
 
 function isLocalOrPrivateHost(hostname: string): boolean {
-  const lower = hostname.toLowerCase();
+  const lower = hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (lower === "localhost" || lower.endsWith(".localhost")) return true;
+  if (lower.endsWith(".local") || lower.endsWith(".lan") || lower.endsWith(".home.arpa")) return true;
+  if (!lower.includes(".") && lower !== "::1") return true;
   if (lower === "127.0.0.1" || lower === "::1") return true;
   const parts = lower.split(".").map((part) => Number.parseInt(part, 10));
   if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part))) return false;
