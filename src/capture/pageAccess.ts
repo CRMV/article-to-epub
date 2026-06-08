@@ -9,23 +9,9 @@ export function captureOriginPatternFromUrl(rawUrl?: string): string | undefined
   }
 }
 
-export interface CaptureAccessResult {
-  granted: boolean;
-  origin?: string;
-  newlyGranted: boolean;
-}
-
-export async function requestCaptureAccess(rawUrl?: string): Promise<CaptureAccessResult> {
+export async function hasCaptureAccess(rawUrl?: string): Promise<boolean> {
   const origin = captureOriginPatternFromUrl(rawUrl);
-  if (!origin) return { granted: false, newlyGranted: false };
+  if (!origin) return false;
 
-  const permissions = { origins: [origin] };
-  if (await chrome.permissions.contains(permissions)) return { granted: true, origin, newlyGranted: false };
-  const granted = await chrome.permissions.request(permissions);
-  return { granted, ...(granted ? { origin } : {}), newlyGranted: granted };
-}
-
-export async function releaseCaptureAccess(access: CaptureAccessResult): Promise<boolean> {
-  if (!access.granted || !access.newlyGranted || !access.origin) return true;
-  return chrome.permissions.remove({ origins: [access.origin] });
+  return chrome.permissions.contains({ origins: [origin] });
 }
