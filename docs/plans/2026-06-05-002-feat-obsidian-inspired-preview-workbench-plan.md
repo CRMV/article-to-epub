@@ -10,15 +10,15 @@ origin: docs/ideation/2026-06-05-obsidian-web-clipper-lessons-ideation.md
 
 ## Summary
 
-Evolve Article Ferry from a linear MVP converter into a faster, more inspectable Kindle preparation workbench. The plan borrows Obsidian Web Clipper's strongest transferable lessons - local/private operation, inspectable capture state, configurable repeat decisions, site-aware extraction, and portable debugging - while staying native to Article Ferry's Kindle EPUB and user-mediated delivery identity.
+Evolve Article to EPUB from a linear MVP converter into a faster, more inspectable Kindle preparation workbench. The plan borrows Obsidian Web Clipper's strongest transferable lessons - local/private operation, inspectable capture state, configurable repeat decisions, site-aware extraction, and portable debugging - while staying native to Article to EPUB's Kindle EPUB and user-mediated delivery identity.
 
 ---
 
 ## Problem Frame
 
-The MVP already has the core local-first conversion pipeline: active-tab snapshot, Readability extraction, metadata ranking, image budgeting, route diagnostics, EPUB build, download, Amazon web upload handoff, email handoff, and privacy-preserving local storage. The ideation document argues that Obsidian Web Clipper feels powerful because users can inspect and shape what will be saved before committing, but Article Ferry should not copy Obsidian's Markdown template model directly.
+The MVP already has the core local-first conversion pipeline: active-tab snapshot, Readability extraction, metadata ranking, image budgeting, route diagnostics, EPUB build, download, Amazon web upload handoff, email handoff, and privacy-preserving local storage. The ideation document argues that Obsidian Web Clipper feels powerful because users can inspect and shape what will be saved before committing, but Article to EPUB should not copy Obsidian's Markdown template model directly.
 
-Article Ferry's equivalent power surface is confidence before Kindle handoff: capture mode clarity, metadata provenance, image/file-size tradeoffs, delivery route fit, remembered local corrections, site-specific extraction fixes, Kindle preview validation, and safe compatibility reporting. This plan covers the full staged set of ranked ideas from the ideation doc while explicitly deferring full template languages, AI interpreter behavior, Markdown export, cross-browser expansion, and multi-article queues.
+Article to EPUB's equivalent power surface is confidence before Kindle handoff: capture mode clarity, metadata provenance, image/file-size tradeoffs, delivery route fit, remembered local corrections, site-specific extraction fixes, Kindle preview validation, and safe compatibility reporting. This plan covers the full staged set of ranked ideas from the ideation doc while explicitly deferring full template languages, AI interpreter behavior, Markdown export, cross-browser expansion, and multi-article queues.
 
 ---
 
@@ -39,7 +39,7 @@ Article Ferry's equivalent power surface is confidence before Kindle handoff: ca
 
 ### Local Site Learning
 
-- R8. When users edit title, author, source, or publication date, Article Ferry can offer to remember a local correction rule for the current domain or URL pattern.
+- R8. When users edit title, author, source, or publication date, Article to EPUB can offer to remember a local correction rule for the current domain or URL pattern.
 - R9. Remembered metadata correction rules apply before the preview is shown, are visible as provenance, and can be reviewed or deleted from a local settings surface.
 - R10. Site recipes can override or supplement metadata and asset selection for known compatibility targets using a narrow, validated rule schema based on URL patterns, meta tags, schema.org data, and safe selectors.
 - R11. V1 site recipes are project-owned and fixture-backed for the existing hard targets before any import/export or user-authored recipe surface is added.
@@ -55,10 +55,10 @@ Article Ferry's equivalent power surface is confidence before Kindle handoff: ca
 ## Key Technical Decisions
 
 - KTD1. Extend the existing preview pipeline instead of replacing it: `buildPreviewFromSnapshot`, `PreviewModel`, `ConversionReport`, and the current side-panel components already expose most of the workbench inputs. The plan should add state shape, provenance, progressive readiness, and UI grouping around those patterns rather than introducing a parallel conversion engine.
-- KTD2. Keep Obsidian-style configurability domain-native: Obsidian templates organize Markdown output into vault destinations, while Article Ferry profiles should organize Kindle route, image budget, and filename conventions. Metadata changes belong to remembered corrections or site recipes because those can expose provenance; a general template language is deferred because it would add complexity outside the EPUB delivery job.
+- KTD2. Keep Obsidian-style configurability domain-native: Obsidian templates organize Markdown output into vault destinations, while Article to EPUB profiles should organize Kindle route, image budget, and filename conventions. Metadata changes belong to remembered corrections or site recipes because those can expose provenance; a general template language is deferred because it would add complexity outside the EPUB delivery job.
 - KTD3. Make progressive preview a state contract, not just UI polish: the text preview should be available after extraction even if asset planning, non-prompting permission preflight, or route diagnostics are still pending. This requires explicit preview stages, local performance marks, a run id keyed by snapshot/effective options, and stale-update rejection so partial states do not look like broken or contradictory states.
 - KTD4. Store user learning as small validated local records: profiles, remembered metadata corrections, and future recipe settings should follow the existing `chrome.storage.local` pattern, cap or validate retained data, and avoid article bodies, sync storage, raw query strings, and broad reading history. Each storage surface needs a data inventory row before implementation.
-- KTD5. Keep site recipes narrow and project-owned first: Obsidian's URL/schema.org triggers prove the value of site-aware extraction, but Article Ferry should start with internal TypeScript constants and fixtures for FS.blog and Wolfram rather than exposing user-authored selectors, import parsers, variables, transforms, loops, or UI authoring.
+- KTD5. Keep site recipes narrow and project-owned first: Obsidian's URL/schema.org triggers prove the value of site-aware extraction, but Article to EPUB should start with internal TypeScript constants and fixtures for FS.blog and Wolfram rather than exposing user-authored selectors, import parsers, variables, transforms, loops, or UI authoring.
 - KTD6. Compatibility kit export is a sanitized diagnostic, not telemetry: the export should be user-initiated, local, inspectable before download, and field-allowlisted. Redaction should reuse the existing conversion-report hostname posture and add tests for private URL/query/body leakage plus sensitive metadata handling.
 - KTD7. Kindle preview validation remains a preview aid, not a second product mode: controls should help users assess EPUB output confidence before generation, but output correctness and route fit remain the primary success criteria.
 - KTD8. Permission preflight is non-prompting in preview: Chrome optional permissions are requested from user gestures, so preview should use `planAssetPermissions` plus `chrome.permissions.contains()` to show current grant status and "will request on Generate" messaging. `chrome.permissions.request()` stays inside explicit generate/export click handlers, and v1 should revoke optional host grants after conversion rather than remembering them.
@@ -87,7 +87,7 @@ flowchart TB
   K --> L[Download and handoff]
 ```
 
-The existing synchronous preview builder can remain the implementation starting point, but the plan should introduce stage-aware state so Article Ferry can show text first and fill diagnostic panels progressively as each local stage completes.
+The existing synchronous preview builder can remain the implementation starting point, but the plan should introduce stage-aware state so Article to EPUB can show text first and fill diagnostic panels progressively as each local stage completes.
 
 ### Local Configuration Layers
 
@@ -548,7 +548,7 @@ Land U7 and U8 last so Kindle preview validation and settings management sit on 
 - AE2. Given an FS.blog preview where the user edits author metadata, when the user chooses to remember the correction, then a later FS.blog preview applies the local correction with visible remembered-rule provenance and allows deletion.
 - AE3. Given the fast email profile, when the selected article has many images, then route diagnostics favor a conservative image posture and warn before email limits are likely to be exceeded.
 - AE4. Given a compatibility issue, when the user exports a compatibility kit, then the downloaded JSON contains report/candidate/decision summaries and omits article body content, selected text, query strings, and fragments.
-- AE5. Given a malformed profile or metadata-rule record in local storage, when the side panel loads, then Article Ferry falls back to defaults and keeps the preview usable.
+- AE5. Given a malformed profile or metadata-rule record in local storage, when the side panel loads, then Article to EPUB falls back to defaults and keeps the preview usable.
 - AE6. Given a clean ordinary article, when a first-time user opens the side panel, then they can review the readable preview, title/author, route status, filename, and generate action without opening advanced details.
 - AE7. Given an image-heavy article with cross-origin assets, when the preview workbench runs permission preflight, then it checks current grants without prompting and only requests optional host access after an explicit Generate or export action.
 
@@ -578,7 +578,7 @@ Land U7 and U8 last so Kindle preview validation and settings management sit on 
 
 ## Sources & Research
 
-- `docs/ideation/2026-06-05-obsidian-web-clipper-lessons-ideation.md` is the origin source for the ranked ideas, rejection boundaries, and Article Ferry strategy translation.
+- `docs/ideation/2026-06-05-obsidian-web-clipper-lessons-ideation.md` is the origin source for the ranked ideas, rejection boundaries, and Article to EPUB strategy translation.
 - `docs/plans/2026-06-05-001-feat-kindle-article-extension-plan.md` establishes the completed MVP architecture and privacy/compliance constraints this plan must preserve.
 - `entrypoints/sidepanel/App.tsx`, `src/ui/state/conversionStore.ts`, `src/types.ts`, `src/storage/recentMetadataEdits.ts`, `src/storage/settings.ts`, and `src/diagnostics/conversionReport.ts` show the current local-first pipeline, side-panel composition, storage model, and diagnostic redaction patterns.
 - Obsidian Web Clipper documentation highlights local/private clipping, reader mode, templates, variables, URL/schema.org triggers, and optional Interpreter behavior: `https://obsidian.md/help/web-clipper`, `https://obsidian.md/help/web-clipper/templates`, `https://obsidian.md/help/web-clipper/variables`, and `https://obsidian.md/help/web-clipper/interpreter`.

@@ -1,4 +1,6 @@
 import type { AssetCandidate } from "../types";
+import { promoteStyledSuperscripts } from "../html/superscript";
+import { promoteBulletParagraphs } from "../html/lists";
 
 const REMOVE_SELECTORS = [
   "script",
@@ -46,6 +48,9 @@ export function normalizeArticleHtml(html: string, baseUrl: string): Normalizati
     warnings.push(`removed:${node.tagName.toLowerCase()}`);
     node.remove();
   }
+
+  promoteStyledSuperscripts(root);
+  promoteBulletParagraphs(root);
 
   for (const element of root.querySelectorAll<HTMLElement>("*")) {
     for (const attribute of Array.from(element.attributes)) {
@@ -140,8 +145,11 @@ function sanitizeLinks(root: ParentNode, baseUrl: string): void {
 }
 
 function safeLinkHref(rawHref: string, baseUrl: string): string | undefined {
+  const trimmed = rawHref.trim();
+  if (trimmed.startsWith("#")) return trimmed;
+
   try {
-    const url = new URL(rawHref, baseUrl);
+    const url = new URL(trimmed, baseUrl);
     return url.protocol === "http:" || url.protocol === "https:" || url.protocol === "mailto:" ? url.toString() : undefined;
   } catch {
     return undefined;

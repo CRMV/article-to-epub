@@ -46,7 +46,7 @@ async function captureActiveTab(): Promise<{ ok: true } | { ok: false; message: 
 async function captureTab(tabId: number, url: string | undefined, options: { activeTabGrant: boolean }): Promise<void> {
   try {
     if (!options.activeTabGrant && !(await hasCaptureAccess(url))) {
-      throw new Error("Article Ferry needs a fresh toolbar click before it can capture this page.");
+      throw new Error("Article to EPUB needs a fresh toolbar click before it can capture this page.");
     }
     const results = (await chrome.scripting.executeScript({
       target: { tabId },
@@ -70,7 +70,7 @@ async function publishCaptureError(message: string): Promise<void> {
   await chrome.runtime
     .sendMessage({
       type: SNAPSHOT_ERROR_MESSAGE,
-      message: `${message} Click the Article Ferry toolbar icon from the article tab to refresh access.`
+      message: `${message} Click the Article to EPUB toolbar icon from the article tab to refresh access.`
     })
     .catch(() => undefined);
 }

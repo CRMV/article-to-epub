@@ -83,9 +83,26 @@ export function stylesheet(): string {
   font-family: serif;
   line-height: 1.45;
 }
+p {
+  margin: 0 0 0.85em;
+}
 img {
   max-width: 100%;
   height: auto;
+}
+ul,
+ol {
+  margin: 0.35em 0 0.85em 1.4em;
+  padding: 0;
+}
+li {
+  margin: 0.3em 0;
+}
+sup,
+.noteref {
+  font-size: 0.72em;
+  line-height: 0;
+  vertical-align: super;
 }
 .image-skipped {
   color: #555;
@@ -99,5 +116,5 @@ function stableIdentifier(seed: string): string {
   for (const char of seed) {
     hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   }
-  return `article-ferry-${hash.toString(16)}`;
+  return `article-to-epub-${hash.toString(16)}`;
 }

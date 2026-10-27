@@ -3,6 +3,7 @@ import type { ExtractionResult, NormalizedArticle, PageSnapshot } from "../types
 import { normalizeArticleHtml } from "./contentNormalizer";
 import { documentFromFragment, parseSnapshotDocument } from "./documentSnapshot";
 import { hasUsableSelection, selectionHtml } from "./selectionSnapshot";
+import { cleanPrintLayoutArtifacts } from "../html/printLayout";
 
 export function extractReadableArticle(snapshot: PageSnapshot): ExtractionResult {
   if (snapshot.mode === "selection" && hasUsableSelection(snapshot)) {
@@ -29,6 +30,7 @@ export function extractReadableArticle(snapshot: PageSnapshot): ExtractionResult
   }
 
   const document = parseSnapshotDocument(snapshot);
+  cleanPrintLayoutArtifacts(document);
   const reader = new Readability(document, {
     keepClasses: false
   });

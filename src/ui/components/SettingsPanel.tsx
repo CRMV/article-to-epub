@@ -36,7 +36,7 @@ export function SettingsPanel({
         <button
           type="button"
           onClick={() => {
-            if (window.confirm("Clear Article Ferry local settings and remembered metadata rules?")) onClear();
+            if (window.confirm("Clear Article to EPUB local settings and remembered metadata rules?")) onClear();
           }}
         >
           Clear local settings

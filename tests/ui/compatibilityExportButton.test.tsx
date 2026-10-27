@@ -57,7 +57,7 @@ describe("CompatibilityExportButton", () => {
     expect(screen.getByText("Preview JSON")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Export kit" }));
 
-    expect(onExport).toHaveBeenCalledWith(expect.stringContaining('"version": 1'), "article-ferry-compatibility-example.com.json");
+    expect(onExport).toHaveBeenCalledWith(expect.stringContaining('"version": 1'), "article-to-epub-compatibility-example.com.json");
     const [payload] = onExport.mock.calls[0] as [string, string];
     const kit = JSON.parse(payload);
 

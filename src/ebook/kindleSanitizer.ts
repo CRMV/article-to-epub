@@ -1,4 +1,6 @@
 import { serializeXhtmlChildren } from "./xhtmlSerializer";
+import { promoteStyledSuperscripts } from "../html/superscript";
+import { promoteBulletParagraphs } from "../html/lists";
 
 const REMOVE_SELECTORS = [
   "script",
@@ -30,6 +32,9 @@ export function sanitizeForEpub(contentHtml: string, assetHrefByUrl = new Map<st
   for (const node of root.querySelectorAll(REMOVE_SELECTORS.join(","))) {
     node.remove();
   }
+
+  promoteStyledSuperscripts(root);
+  promoteBulletParagraphs(root);
 
   for (const element of root.querySelectorAll<HTMLElement>("*")) {
     for (const attribute of Array.from(element.attributes)) {

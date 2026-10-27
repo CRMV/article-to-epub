@@ -2,17 +2,27 @@
 
 ## Public Name
 
-Article Ferry
+Article to EPUB
 
 ## Short Description
 
-Convert article pages into Kindle-ready EPUB files with local preview, metadata editing, and image-aware size controls.
+Send web articles to Kindle as EPUB.
 
 ## Detailed Description
 
-Article Ferry turns the current article page into a clean EPUB file you can upload through Amazon-supported document routes. It provides a local preview, editable title/author/date/source fields, image modes, and conversion warnings before download.
+Article to EPUB converts the current web article into a clean EPUB file you can download and send through Amazon-supported document routes.
 
-Article Ferry is not affiliated with Amazon. It does not automate Amazon login, use Amazon credentials, or call private Amazon delivery endpoints.
+Use it when a web article is worth reading away from the browser. The extension captures the active page after you click it, builds a readable local preview, lets you edit title, author, date, and source metadata, and shows image and file-size warnings before export.
+
+Features:
+- Convert the active article page into a Kindle-ready EPUB
+- Preview the article before generating the file
+- Edit metadata before download
+- Choose image handling modes for smaller or richer files
+- Save reusable local Kindle/profile preferences
+- Download the EPUB for Send to Kindle web upload or approved-sender email
+
+Article to EPUB is not affiliated with Amazon. It does not automate Amazon login, use Amazon credentials, or call private Amazon delivery endpoints.
 
 ## Permission Justification
 
@@ -30,4 +40,3 @@ Article Ferry is not affiliated with Amazon. It does not automate Amazon login, 
 - Image mode and route-fit warning.
 - Download and Amazon web handoff state.
 - Permission request explanation for cross-origin images.
-

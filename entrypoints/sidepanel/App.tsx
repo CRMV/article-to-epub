@@ -81,7 +81,7 @@ function App() {
 
     const onMessage = (message: unknown) => {
       if (!isSnapshotMessage(message)) return;
-      if (message.type === "article-ferry:snapshot-ready") {
+      if (message.type === "article-to-epub:snapshot-ready") {
         setSnapshot(message.snapshot);
         setMetadataEdits({});
         return;
@@ -146,12 +146,12 @@ function App() {
         | { ok: true }
         | { ok: false; message: string };
       if (!response?.ok) {
-        throw new Error(response?.message ?? "Click the Article Ferry toolbar icon from the article tab to refresh access.");
+        throw new Error(response?.message ?? "Click the Article to EPUB toolbar icon from the article tab to refresh access.");
       }
     } catch (error) {
       setStatus({
         kind: "error",
-        text: error instanceof Error ? error.message : "Click the Article Ferry toolbar icon from the article tab to refresh access."
+        text: error instanceof Error ? error.message : "Click the Article to EPUB toolbar icon from the article tab to refresh access."
       });
     } finally {
       setBusy(false);
@@ -227,7 +227,7 @@ function App() {
   async function showEmailDetails() {
     if (!editedMetadata || !generatedFileName) return;
     try {
-      const handoff = createEmailHandoff(kindleEmail, editedMetadata.title ?? "Article Ferry EPUB", generatedFileName);
+      const handoff = createEmailHandoff(kindleEmail, editedMetadata.title ?? "Article to EPUB", generatedFileName);
       await navigator.clipboard?.writeText(`${handoff.recipient}\n${handoff.subject}\n${handoff.body}`);
       setStatus({ kind: "done", text: "Email handoff details copied. Attach the downloaded EPUB before sending." });
     } catch (error) {
@@ -306,7 +306,7 @@ function App() {
       <header className="top-strip" data-kind={status.kind} aria-live="polite">
         <div>
           <p className="eyebrow">{status.kind}</p>
-          <h1>Article Ferry</h1>
+          <h1>Article to EPUB</h1>
           <p className="status-text">{status.text}</p>
         </div>
         <button type="button" onClick={captureActiveTab} disabled={busy}>

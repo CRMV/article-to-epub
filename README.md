@@ -1,8 +1,8 @@
-# Article Ferry
+# Article to EPUB
 
-Article Ferry is a local-first Chrome extension that converts the current article page into a Kindle-ready EPUB file. It focuses on preview quality, editable metadata, image-aware size controls, reusable Kindle profiles, and user-mediated handoff through Amazon-supported document routes.
+Article to EPUB is a local-first Chrome extension that converts the current article page into a Kindle-ready EPUB file. It focuses on preview quality, editable metadata, image-aware size controls, reusable Kindle profiles, and user-mediated handoff through Amazon-supported document routes.
 
-Article Ferry is not affiliated with Amazon. It does not automate Amazon login, use Amazon credentials, access Amazon cookies, or call private Amazon delivery endpoints.
+Article to EPUB is not affiliated with Amazon. It does not automate Amazon login, use Amazon credentials, access Amazon cookies, or call private Amazon delivery endpoints.
 
 ## Development
 

@@ -79,6 +79,6 @@ describe("compatibility kit", () => {
   });
 
   it("builds a safe filename from the source host", () => {
-    expect(compatibilityKitFileName(preview)).toBe("article-ferry-compatibility-example.com.json");
+    expect(compatibilityKitFileName(preview)).toBe("article-to-epub-compatibility-example.com.json");
   });
 });

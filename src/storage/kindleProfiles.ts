@@ -4,7 +4,7 @@ export const builtInProfiles: KindleProfile[] = [
   {
     id: "default",
     name: "Balanced",
-    description: "Current Article Ferry defaults for web upload.",
+    description: "Current Article to EPUB defaults for web upload.",
     route: "amazon-web",
     imageMode: "smart-images",
     filenamePattern: "standard"

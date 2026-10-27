@@ -1,0 +1,38 @@
+{
+  "name": "article-to-epub",
+  "version": "0.1.0",
+  "description": "Marketplace copy support for Article to EPUB, a local-first extension that creates Kindle-ready EPUBs from article pages.",
+  "author": {
+    "name": "Article to EPUB contributors",
+    "url": "https://github.com/CRMV"
+  },
+  "homepage": "https://github.com/CRMV/article-to-epub",
+  "repository": "https://github.com/CRMV/article-to-epub",
+  "license": "MIT",
+  "keywords": [
+    "kindle",
+    "epub",
+    "marketplace-copy",
+    "chrome-extension",
+    "article"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Article to EPUB",
+    "shortDescription": "Draft polished Article to EPUB marketplace copy.",
+    "longDescription": "Article to EPUB helps turn article pages into Kindle-ready EPUB files with local preview, editable metadata, image-aware size controls, and manual handoff through Amazon-supported document routes.\n\nThis Codex plugin provides a focused skill for drafting and validating marketplace-facing copy for Article to EPUB. It keeps listing language accurate, privacy-aware, and careful about Amazon non-affiliation while helping prepare plugin metadata, Chrome Web Store descriptions, permission justifications, screenshot captions, and release copy.",
+    "developerName": "Article to EPUB contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "websiteURL": "https://github.com/CRMV/article-to-epub",
+    "privacyPolicyURL": "https://github.com/CRMV/article-to-epub/blob/main/docs/privacy.md",
+    "brandColor": "#2563EB",
+    "defaultPrompt": [
+      "Draft Article to EPUB marketplace descriptions.",
+      "Review Article to EPUB permission copy.",
+      "Polish Article to EPUB privacy summary."
+    ]
+  }
+}

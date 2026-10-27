@@ -93,5 +93,5 @@ function redactedOrigins(origins: string[]): string[] {
 
 export function compatibilityKitFileName(preview: PreviewModel): string {
   const host = redactedHost(preview.snapshot.canonicalUrl ?? preview.snapshot.url).replace(/[^a-z0-9.-]+/gi, "-");
-  return `article-ferry-compatibility-${host || "site"}.json`;
+  return `article-to-epub-compatibility-${host || "site"}.json`;
 }

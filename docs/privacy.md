@@ -1,6 +1,6 @@
 # Privacy Policy Draft
 
-Article Ferry processes the active page only after the user clicks the extension action.
+Article to EPUB processes the active page only after the user clicks the extension action.
 
 ## Data Processed Locally
 
@@ -27,4 +27,4 @@ The MVP has no analytics, no remote crash reporting, no backend, and no automati
 
 ## Amazon
 
-Article Ferry is not affiliated with Amazon. The extension does not automate Amazon login, access Amazon cookies, scrape account pages, or call private Amazon delivery endpoints.
+Article to EPUB is not affiliated with Amazon. The extension does not automate Amazon login, access Amazon cookies, scrape account pages, or call private Amazon delivery endpoints.

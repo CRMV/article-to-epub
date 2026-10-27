@@ -34,7 +34,7 @@ test("side panel keeps primary actions visible at narrow width", async ({ page }
     await page.setViewportSize({ width: 320, height: 640 });
     await page.goto(`${server.url}/sidepanel.html`);
 
-    await expect(page.getByRole("heading", { name: "Article Ferry" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Article to EPUB" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Capture" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Preview" })).toBeVisible();
   } finally {

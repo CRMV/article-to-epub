@@ -9,11 +9,11 @@ mode: repo-grounded
 
 ## Grounding Context
 
-Article Ferry is a local-first WXT/React/TypeScript Chrome MV3 extension. It captures the active article, builds a preview using Readability plus custom metadata and image layers, lets users edit metadata, budgets images, generates a Kindle-ready EPUB, and hands off through download, Amazon web upload, or Kindle email. The product strategy is privacy-preserving, Amazon-compatible but unaffiliated, no backend, no telemetry, no Amazon credential automation, and user-mediated delivery.
+Article to EPUB is a local-first WXT/React/TypeScript Chrome MV3 extension. It captures the active article, builds a preview using Readability plus custom metadata and image layers, lets users edit metadata, budgets images, generates a Kindle-ready EPUB, and hands off through download, Amazon web upload, or Kindle email. The product strategy is privacy-preserving, Amazon-compatible but unaffiliated, no backend, no telemetry, no Amazon credential automation, and user-mediated delivery.
 
 Obsidian Web Clipper's strongest visible lessons are not just feature count. It makes clipping feel configurable, inspectable, local, and fast. Its public docs emphasize highlighter, reader mode, templates, variables, filters, logic, URL/schema.org triggers, import/exportable template JSON, optional Interpreter prompts, and local/private clipping into durable files. Its source README highlights open-source/auditable code, cross-browser builds, durable offline Markdown, template validation, template logic, local image saving, and future template directory/settings sync.
 
-The most important translation: Obsidian's "templates" should not be copied literally. Article Ferry's equivalent power surface is Kindle route choice, image/file-size tradeoffs, metadata correction, site-specific extraction, and confidence before manual handoff.
+The most important translation: Obsidian's "templates" should not be copied literally. Article to EPUB's equivalent power surface is Kindle route choice, image/file-size tradeoffs, metadata correction, site-specific extraction, and confidence before manual handoff.
 
 ## Topic Axes
 
@@ -32,9 +32,9 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 **Axis:** Preview/editor ergonomics
 
-**Basis:** `direct:` Article Ferry already has the underlying data in `PageSnapshot.mode`, `ResolvedMetadata.candidates`, `planImageBudget`, `buildConversionReport`, `planAssetPermissions`, and `buildFileName`.
+**Basis:** `direct:` Article to EPUB already has the underlying data in `PageSnapshot.mode`, `ResolvedMetadata.candidates`, `planImageBudget`, `buildConversionReport`, `planAssetPermissions`, and `buildFileName`.
 
-**Rationale:** Obsidian feels polished because the user can see and shape what will be saved before committing. Article Ferry can get the same confidence boost without copying Obsidian's note-template model.
+**Rationale:** Obsidian feels polished because the user can see and shape what will be saved before committing. Article to EPUB can get the same confidence boost without copying Obsidian's note-template model.
 
 **Downsides:** Adds UI density to the side panel and needs careful narrow-panel layout.
 
@@ -50,7 +50,7 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 **Axis:** Speed and perceived speed
 
-**Basis:** `reasoned:` Obsidian appears fast because its normal path is local, deterministic, and text-first, while slow Interpreter work is opt-in. Article Ferry's heavier EPUB/image pipeline can still feel fast if it shows the reading result before expensive packaging work.
+**Basis:** `reasoned:` Obsidian appears fast because its normal path is local, deterministic, and text-first, while slow Interpreter work is opt-in. Article to EPUB's heavier EPUB/image pipeline can still feel fast if it shows the reading result before expensive packaging work.
 
 **Rationale:** Ferry may already be fast in absolute terms, but perceived speed matters. A user who sees clean article text immediately will tolerate later image/report work better than a user watching a single "loading" state.
 
@@ -68,9 +68,9 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 **Axis:** Delivery presets
 
-**Basis:** `reasoned:` Obsidian templates work because vault output differs by destination and content type. Article Ferry's equivalent variability is Kindle route constraints and image/file-size tradeoffs, not Markdown note layout.
+**Basis:** `reasoned:` Obsidian templates work because vault output differs by destination and content type. Article to EPUB's equivalent variability is Kindle route constraints and image/file-size tradeoffs, not Markdown note layout.
 
-**Rationale:** This borrows configurable power while staying native to Article Ferry's job. It turns repeated Kindle decisions into reusable setup without requiring users to learn selectors or template syntax.
+**Rationale:** This borrows configurable power while staying native to Article to EPUB's job. It turns repeated Kindle decisions into reusable setup without requiring users to learn selectors or template syntax.
 
 **Downsides:** Profiles can become settings sprawl if introduced before the default route is excellent.
 
@@ -86,7 +86,7 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 **Axis:** Site-specific extraction rules
 
-**Basis:** `external:` Obsidian supports automatic template triggers using URL patterns and schema.org data, plus variables from meta tags, selectors, and schema.org. `direct:` Article Ferry already has compatibility fixtures and known hard target pages.
+**Basis:** `external:` Obsidian supports automatic template triggers using URL patterns and schema.org data, plus variables from meta tags, selectors, and schema.org. `direct:` Article to EPUB already has compatibility fixtures and known hard target pages.
 
 **Rationale:** The strongest lesson from Obsidian is that one universal extractor is never enough. Site recipes make hard-won fixes reusable and testable without making every user a template author on day one.
 
@@ -124,7 +124,7 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 **Basis:** `direct:` The README asks users to file compatibility reports with short snippets, public URLs, screenshots, and conversion-report summaries rather than full article bodies. The privacy docs explicitly avoid article bodies and full reading-history URLs.
 
-**Rationale:** Obsidian's open-source/auditable posture is part of its trust. Article Ferry can turn privacy constraints into a debugging advantage by making safe reports easy.
+**Rationale:** Obsidian's open-source/auditable posture is part of its trust. Article to EPUB can turn privacy constraints into a debugging advantage by making safe reports easy.
 
 **Downsides:** Needs careful redaction tests, and even sanitized metadata can leak sensitive reading context if users export blindly.
 
@@ -140,9 +140,9 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 **Axis:** Capture modes
 
-**Basis:** `external:` Obsidian Web Clipper includes Reader mode and its 2026 release notes mention reader customization. `direct:` Article Ferry already renders article content in `ArticlePreview`.
+**Basis:** `external:` Obsidian Web Clipper includes Reader mode and its 2026 release notes mention reader customization. `direct:` Article to EPUB already renders article content in `ArticlePreview`.
 
-**Rationale:** Article Ferry cannot beat Amazon's official extension on pure one-click delivery yet, so it should win on confidence. A better reader-like preview makes the manual handoff feel worthwhile.
+**Rationale:** Article to EPUB cannot beat Amazon's official extension on pure one-click delivery yet, so it should win on confidence. A better reader-like preview makes the manual handoff feel worthwhile.
 
 **Downsides:** Reader polish can become a rabbit hole and distract from Kindle output correctness if not scoped.
 
@@ -156,13 +156,13 @@ The most important translation: Obsidian's "templates" should not be copied lite
 
 Obsidian likely feels fast for several overlapping reasons:
 
-- Its default output is lighter than Article Ferry's. Markdown/local-vault clipping is generally cheaper than packaging a Kindle-ready EPUB with sanitized XHTML, image decisions, and zip output.
+- Its default output is lighter than Article to EPUB's. Markdown/local-vault clipping is generally cheaper than packaging a Kindle-ready EPUB with sanitized XHTML, image decisions, and zip output.
 - Its slow path is explicit. Interpreter/AI prompt variables are opt-in, while normal variables, selectors, filters, and schema/meta extraction are deterministic local work.
 - It has a purpose-built extraction engine. The official repo uses Defuddle, which was created for Obsidian Web Clipper.
 - Templates reduce repeated guessing. Site/template triggers let the clipper use known page structure instead of treating every capture as a fresh universal extraction problem.
-- It appears to optimize for first useful output. Even if Article Ferry is fast in absolute terms, a single loading state can feel slower than progressive preview.
+- It appears to optimize for first useful output. Even if Article to EPUB is fast in absolute terms, a single loading state can feel slower than progressive preview.
 
-Article Ferry speed experiments worth considering:
+Article to EPUB speed experiments worth considering:
 
 - Render the text preview before image planning finishes.
 - Defer optional image permission and image fetching until Generate EPUB.

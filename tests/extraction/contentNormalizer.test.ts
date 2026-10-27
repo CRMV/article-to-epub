@@ -41,4 +41,27 @@ describe("normalizeArticleHtml", () => {
     expect(result.html).not.toContain('src="https://cdn.example.net/a.jpg"');
     expect(result.html).toContain('data-asset-url="https://cdn.example.net/a.jpg"');
   });
+
+  it("promotes Workiva-style note numbers to semantic superscript", () => {
+    const result = normalizeArticleHtml(
+      '<p>We operated in approximately 230 cities<font style="color:#000;font-size:6.5pt;position:relative;top:-3.5pt;vertical-align:baseline">1</font> across 29 countries<a href="#note-2" style="font-size:6.5pt;position:relative;top:-3.5pt">2</a>.</p><p id="note-2">2 The principal countries...</p>',
+      "https://www.sec.gov/Archives/edgar/data/1699963/000162828026032523/neutronholdingsinc-sx1.htm"
+    );
+
+    expect(result.html).toContain('cities<sup class="noteref">1</sup> across 29 countries<sup class="noteref"><a href="#note-2" rel="noreferrer noopener">2</a></sup>.');
+    expect(result.html).toContain('id="note-2"');
+    expect(result.html).not.toContain("font-size");
+    expect(result.textContent).toContain("cities1 across 29 countries2");
+  });
+
+  it("converts bullet paragraphs into semantic lists", () => {
+    const result = normalizeArticleHtml(
+      '<p><span>•</span><span>Proprietary Hardware:</span><span> Vehicles and fleet.</span></p><p><span>•</span><span>Software:</span><span> Rider and operations tools.</span></p><p>After list.</p>',
+      "https://www.sec.gov/Archives/edgar/data/1699963/000162828026032523/neutronholdingsinc-sx1.htm"
+    );
+
+    expect(result.html).toContain("<ul><li><span>Proprietary Hardware:</span><span> Vehicles and fleet.</span></li><li><span>Software:</span><span> Rider and operations tools.</span></li></ul>");
+    expect(result.html).toContain("<p>After list.</p>");
+    expect(result.textContent).not.toContain("•");
+  });
 });
