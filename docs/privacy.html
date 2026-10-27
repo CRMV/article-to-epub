@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy — Article to EPUB</title>
+    <meta name="description" content="Privacy policy for the Article to EPUB browser extension." />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1c2421;
+        --muted: #52605b;
+        --line: #d7e0dc;
+        --paper: #f7f6f1;
+        --card: #ffffff;
+        --accent: #1f6f63;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 18px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      }
+      main {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 3rem 1.25rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+      }
+      .mark {
+        color: var(--accent);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 0.78rem;
+        font-weight: 750;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      h1 { font-size: 2.2rem; line-height: 1.15; margin: 0.3rem 0 0.4rem; }
+      h2 { font-size: 1.25rem; margin: 1.8rem 0 0.4rem; }
+      p, li { color: var(--ink); }
+      .meta, a { color: var(--muted); }
+      a { color: var(--accent); }
+      ul { padding-left: 1.2rem; }
+      footer {
+        margin-top: 2.5rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="mark">Article to EPUB</p>
+        <h1>Privacy Policy</h1>
+        <p class="meta">Effective date: October 27, 2026</p>
+      </header>
+      <p>Article to EPUB is a browser extension that converts the active web page into an EPUB file on your computer. This policy describes what the extension handles and what it does not do.</p>
+
+      <h2>Who this applies to</h2>
+      <p>This policy covers the Article to EPUB Chrome extension. It does not cover Amazon, the Chrome Web Store, or the websites you choose to capture.</p>
+      <p>Contact: <a href="https://github.com/CRMV/article-to-epub/issues">GitHub issues for CRMV/article-to-epub</a>.</p>
+
+      <h2>What the extension processes</h2>
+      <p>After you click the extension, it reads the active tab so it can build a preview and an EPUB. That local processing can include:</p>
+      <ul>
+        <li>The page URL, title, and HTML needed to extract the article</li>
+        <li>Text you have selected, if you capture a selection</li>
+        <li>Metadata candidates such as title, author, date, source, and canonical URL</li>
+        <li>Image URLs and, if you choose to include images, the image bytes needed for the EPUB</li>
+        <li>The EPUB file generated from that capture</li>
+      </ul>
+      <p>This processing happens in the extension on your device. Article content is not uploaded to the developer.</p>
+
+      <h2>What is stored on your device</h2>
+      <p>The extension uses <code>chrome.storage.local</code> for settings you choose to keep:</p>
+      <ul>
+        <li>Image mode, delivery route, and selected Kindle profile</li>
+        <li>An optional Send to Kindle email address, only if you type one in</li>
+        <li>Metadata correction rules for a site or path, storing the corrected field and value</li>
+      </ul>
+      <p>It does not use <code>chrome.storage.sync</code>. Stored data does not include Amazon passwords, Amazon cookies, generated EPUB files, article bodies, or a browsing-history list.</p>
+      <p>A captured page snapshot can remain in <code>chrome.storage.session</code> until you capture another page or the browser session ends. Session storage stays on the device.</p>
+
+      <h2>What is not collected</h2>
+      <p>The extension has no account, no backend, no analytics, no advertising, and no remote crash reporting. It does not sell data. It does not use data for credit, lending, or interest-based ads. It does not send article HTML, selected text, metadata, or EPUB files to the developer.</p>
+      <p>Optional image-host access is requested only from an explicit action such as Generate EPUB, and only for image origins that are not the page you captured. The extension removes those optional host grants after that conversion attempt.</p>
+
+      <h2>Permissions</h2>
+      <ul>
+        <li><strong>activeTab</strong> reads the current page only after you click the extension.</li>
+        <li><strong>scripting</strong> runs the snapshot in that tab after the click.</li>
+        <li><strong>sidePanel</strong> shows the preview and export controls.</li>
+        <li><strong>storage</strong> keeps the local settings described above.</li>
+        <li><strong>downloads</strong> saves the EPUB you generate.</li>
+        <li><strong>Optional host access</strong> fetches cross-origin images you chose to include. It is not used to browse other sites.</li>
+      </ul>
+
+      <h2>EPUB files you send yourself</h2>
+      <p>Downloading an EPUB, uploading it on Amazon's Send to Kindle page, or attaching it to an email is something you do. Those services have their own privacy policies. Article to EPUB does not sign in to Amazon, read Amazon cookies, or call private Amazon delivery endpoints.</p>
+
+      <h2>Amazon</h2>
+      <p>Article to EPUB is not affiliated with Amazon.</p>
+
+      <h2>Changes</h2>
+      <p>If this policy changes, the updated version will replace this page and the effective date above will change.</p>
+      <footer>Article to EPUB. Local processing, no developer account.</footer>
+    </main>
+  </body>
+</html>

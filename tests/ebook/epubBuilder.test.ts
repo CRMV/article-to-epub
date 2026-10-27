@@ -93,6 +93,24 @@ describe("buildEpub", () => {
     expect(buildFileName(metadata, "date-title")).toBe("2026-06-05__readable-article__avery-stone.epub");
   });
 
+  it("splits very large articles into multiple spine documents", async () => {
+    const section = (index: number) => `<h2>Section ${index}</h2>${"<p>Readable paragraph for the Kindle chapter split.</p>".repeat(8)}`;
+    const bytes = await buildEpub({
+      article: { ...article, contentHtml: Array.from({ length: 6 }, (_value, index) => section(index + 1)).join("") },
+      metadata,
+      maxChapterChars: 700
+    });
+    const zip = await JSZip.loadAsync(bytes);
+    const names = Object.keys(zip.files).filter((name) => name.startsWith("OEBPS/text/") && name.endsWith(".xhtml"));
+    expect(names.length).toBeGreaterThan(1);
+    expect(names.every((name) => name.includes("chapter-"))).toBe(true);
+    const opf = await zip.file("OEBPS/package.opf")?.async("string");
+    expect(opf).toContain("chapter-1");
+    const nav = await zip.file("OEBPS/nav.xhtml")?.async("string");
+    expect(nav).toContain("chapter-");
+    expect(nav).toContain("Section 1");
+  });
+
   it("caps pathological filename metadata", () => {
     const longMetadata = {
       ...metadata,

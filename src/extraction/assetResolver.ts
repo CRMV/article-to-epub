@@ -27,7 +27,8 @@ export function resolveArticleAssets(article: NormalizedArticle, openGraphImage?
 export function estimateImageBytes(candidate: AssetCandidate): number {
   if (candidate.width && candidate.height) {
     const pixels = candidate.width * candidate.height;
-    return Math.min(Math.max(Math.round(pixels * 0.22), 60_000), 1_200_000);
+    if (pixels >= 640 * 360) return Math.min(Math.max(Math.round(pixels * 0.45), 900_000), 4_000_000);
+    return Math.min(Math.max(Math.round(pixels * 0.22), 40_000), 900_000);
   }
 
   if (candidate.source === "open-graph") return 500_000;

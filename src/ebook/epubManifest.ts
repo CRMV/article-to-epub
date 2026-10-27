@@ -19,7 +19,12 @@ export function containerXml(): string {
 `;
 }
 
-export function packageOpf(metadata: ResolvedMetadata, assets: ManifestAsset[]): string {
+export interface SpineDocument {
+  id: string;
+  href: string;
+}
+
+export function packageOpf(metadata: ResolvedMetadata, assets: ManifestAsset[], documents: SpineDocument[] = [{ id: "article", href: "text/article.xhtml" }]): string {
   const title = metadata.title?.trim() || "Untitled Article";
   const identifier = stableIdentifier(metadata.canonicalUrl ?? title);
   const author = metadata.author?.trim() || "Unknown Author";
@@ -43,21 +48,23 @@ export function packageOpf(metadata: ResolvedMetadata, assets: ManifestAsset[]):
   </metadata>
   <manifest>
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav" />
-    <item id="article" href="text/article.xhtml" media-type="application/xhtml+xml" />
+${documents.map((document) => `    <item id="${document.id}" href="${document.href}" media-type="application/xhtml+xml" />`).join("\n")}
     <item id="style" href="styles/article.css" media-type="text/css" />
 ${assetItems}
   </manifest>
   <spine>
-    <itemref idref="article" />
+${documents.map((document) => `    <itemref idref="${document.id}" />`).join("\n")}
   </spine>
 </package>
 `;
 }
 
 export function navXhtml(title: string, toc: TocEntry[]): string {
-  const entries = toc.length > 0 ? toc : [{ id: "top", level: 1, label: title }];
-  const links = entries
-    .map((entry) => `      <li><a href="text/article.xhtml#${escapeXml(entry.id)}">${escapeXml(entry.label)}</a></li>`)
+  const major = toc.length > 160 ? toc.filter((entry) => entry.level <= 2) : toc;
+  const entries = (major.length > 0 ? major : toc).slice(0, 180);
+  const visible = entries.length > 0 ? entries : [{ id: "top", level: 1, label: title }];
+  const links = visible
+    .map((entry) => `      <li><a href="${escapeXml(entry.href ?? `text/article.xhtml#${entry.id}`)}">${escapeXml(entry.label)}</a></li>`)
     .join("\n");
 
   return `<?xml version="1.0" encoding="utf-8"?>
@@ -98,11 +105,36 @@ ol {
 li {
   margin: 0.3em 0;
 }
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 1.15em 0 0.45em;
+  page-break-after: avoid;
+}
+h1 { font-size: 1.45em; }
+h2 { font-size: 1.22em; }
+h3 { font-size: 1.08em; }
 sup,
 .noteref {
   font-size: 0.72em;
   line-height: 0;
   vertical-align: super;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8em 0 1em;
+  font-size: 0.86em;
+}
+td,
+th {
+  border: 1px solid #444;
+  padding: 0.25em 0.4em;
+  vertical-align: top;
+}
+th {
+  font-weight: bold;
 }
 .image-skipped {
   color: #555;

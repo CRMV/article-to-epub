@@ -4,7 +4,7 @@ import { normalizeArticleHtml } from "../../src/extraction/contentNormalizer";
 describe("normalizeArticleHtml", () => {
   it("removes unsafe/runtime-only elements and inline handlers", () => {
     const result = normalizeArticleHtml(
-      '<p onclick="alert(1)">Hello</p><script>bad()</script><form><input /></form><video src="x"></video>',
+      '<p onclick="alert(1)">Hello</p><script>bad()</script><form><input /></form><video src="x"></video><map name="m"><area href="https://example.com"/></map>',
       "https://example.com/post"
     );
 
@@ -12,6 +12,7 @@ describe("normalizeArticleHtml", () => {
     expect(result.html).not.toContain("onclick");
     expect(result.html).not.toContain("script");
     expect(result.html).not.toContain("form");
+    expect(result.html).not.toContain("<map");
     expect(result.warnings).toContain("removed:script");
   });
 
@@ -27,6 +28,18 @@ describe("normalizeArticleHtml", () => {
     expect(result.html).toContain('data-asset-url="https://example.com/small.jpg"');
     expect(result.html).not.toContain("srcset");
     expect(result.html).not.toContain('src="/small.jpg"');
+  });
+
+  it("drops editor metadata attributes and empty rule tables", () => {
+    const result = normalizeArticleHtml(
+      '<p data-mw="{&quot;name&quot;:&quot;ref&quot;}" about="#mwt">Hello</p><table><tbody><tr><td></td></tr></tbody></table>',
+      "https://example.com/post"
+    );
+
+    expect(result.html).toContain("<p>Hello</p>");
+    expect(result.html).not.toContain("data-mw");
+    expect(result.html).not.toContain("about=");
+    expect(result.html).not.toContain("<table");
   });
 
   it("strips preview-loading URLs and unsafe link protocols", () => {

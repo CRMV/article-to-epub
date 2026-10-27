@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import type { KindleProfile, NormalizedArticle, ResolvedMetadata } from "../types";
 import { containerXml, navXhtml, packageOpf, stylesheet, type ManifestAsset } from "./epubManifest";
 import { sanitizeForEpub, wrapXhtmlDocument } from "./kindleSanitizer";
-import { addHeadingIds } from "./tocBuilder";
+import { buildChapters } from "./tocBuilder";
 
 export interface EpubBinaryAsset {
   originalUrl: string;
@@ -15,6 +15,7 @@ export interface BuildEpubInput {
   article: NormalizedArticle;
   metadata: ResolvedMetadata;
   assets?: EpubBinaryAsset[];
+  maxChapterChars?: number;
 }
 
 export async function buildEpub(input: BuildEpubInput): Promise<Uint8Array> {
@@ -23,8 +24,12 @@ export async function buildEpub(input: BuildEpubInput): Promise<Uint8Array> {
   const assets = input.assets ?? [];
   const hrefByUrl = new Map(assets.map((asset) => [asset.originalUrl, `../${asset.href}`]));
   const sanitized = sanitizeForEpub(input.article.contentHtml, hrefByUrl);
-  const withToc = addHeadingIds(`<h1 id="top">${escapeHtml(title)}</h1>${sanitized}`);
-  const articleXhtml = wrapXhtmlDocument(title, withToc.html);
+  const chapters = buildChapters(`<h1 id="top">${escapeHtml(title)}</h1>${sanitized}`, input.maxChapterChars);
+  const documents = chapters.map((chapter, index) => ({
+    id: chapters.length === 1 ? "article" : `chapter-${index + 1}`,
+    href: chapter.href,
+    xhtml: wrapXhtmlDocument(title, chapter.html)
+  }));
   const manifestAssets: ManifestAsset[] = assets.map((asset, index) => ({
     id: `image-${index + 1}`,
     href: asset.href,
@@ -33,9 +38,11 @@ export async function buildEpub(input: BuildEpubInput): Promise<Uint8Array> {
 
   zip.file("mimetype", "application/epub+zip", { compression: "STORE" });
   zip.file("META-INF/container.xml", containerXml());
-  zip.file("OEBPS/package.opf", packageOpf(input.metadata, manifestAssets));
-  zip.file("OEBPS/nav.xhtml", navXhtml(title, withToc.toc));
-  zip.file("OEBPS/text/article.xhtml", articleXhtml);
+  zip.file("OEBPS/package.opf", packageOpf(input.metadata, manifestAssets, documents));
+  zip.file("OEBPS/nav.xhtml", navXhtml(title, chapters.flatMap((chapter) => chapter.toc)));
+  for (const document of documents) {
+    zip.file(`OEBPS/${document.href}`, document.xhtml);
+  }
   zip.file("OEBPS/styles/article.css", stylesheet());
 
   for (const asset of assets) {

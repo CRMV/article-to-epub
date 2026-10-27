@@ -6,7 +6,7 @@ export default defineConfig({
     name: "Article to EPUB",
     short_name: "Article to EPUB",
     description: "Send web articles to Kindle as EPUB with local preview, metadata editing, and image-aware size controls.",
-    version: "0.1.0",
+    version: "1.0.0",
     action: {
       default_title: "Article to EPUB"
     },

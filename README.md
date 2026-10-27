@@ -27,7 +27,7 @@ The verification command runs TypeScript, unit/component tests, and a Chrome MV3
 npm run zip
 ```
 
-The zip command creates a reproducible Chrome MV3 package from the current source tree.
+The zip command creates a reproducible Chrome MV3 package from the current source tree. Store listing text, permission justifications, and the privacy policy are in `docs/store-listing.md`, `docs/privacy.md`, and `docs/privacy.html`.
 
 ## Compatibility Reports
 

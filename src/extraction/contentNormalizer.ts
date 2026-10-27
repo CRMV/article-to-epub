@@ -1,6 +1,7 @@
 import type { AssetCandidate } from "../types";
-import { promoteStyledSuperscripts } from "../html/superscript";
 import { promoteBulletParagraphs } from "../html/lists";
+import { promoteStyledSuperscripts } from "../html/superscript";
+import { captureImageDimensions, removeEmptyTables, stripUnsafeAttributes, unwrapObsoleteElements } from "../html/xhtmlPrep";
 
 const REMOVE_SELECTORS = [
   "script",
@@ -24,6 +25,8 @@ const REMOVE_SELECTORS = [
   "audio",
   "svg",
   "canvas",
+  "map",
+  "area",
   "nav",
   "footer",
   "[hidden]",
@@ -49,17 +52,12 @@ export function normalizeArticleHtml(html: string, baseUrl: string): Normalizati
     node.remove();
   }
 
+  captureImageDimensions(root);
   promoteStyledSuperscripts(root);
   promoteBulletParagraphs(root);
-
-  for (const element of root.querySelectorAll<HTMLElement>("*")) {
-    for (const attribute of Array.from(element.attributes)) {
-      const name = attribute.name.toLowerCase();
-      if (name.startsWith("on") || name === "style" || name === "srcdoc" || name === "poster" || name === "background") {
-        element.removeAttribute(attribute.name);
-      }
-    }
-  }
+  stripUnsafeAttributes(root);
+  unwrapObsoleteElements(root);
+  removeEmptyTables(root);
 
   const assets = collectImageCandidates(root, baseUrl);
   rewriteImageElements(root, baseUrl);

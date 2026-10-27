@@ -49,8 +49,13 @@ export function unsafeReason(rawUrl: string): string | undefined {
 }
 
 function isLikelyDecorative(candidate: AssetCandidate): boolean {
-  const alt = candidate.alt?.trim();
+  const alt = candidate.alt?.trim() ?? "";
   const caption = candidate.caption?.trim();
+  const filenameAlt = /\.(avif|gif|jpe?g|png|webp|svg)$/i.test(alt);
+  const wide = (candidate.width ?? 0) >= 640;
+  const tall = (candidate.height ?? 0) >= 360;
+  if (filenameAlt && wide && tall) return true;
+
   const small = (candidate.width ?? 999) <= 80 || (candidate.height ?? 999) <= 80;
   return !alt && !caption && small;
 }

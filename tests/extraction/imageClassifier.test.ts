@@ -31,6 +31,29 @@ describe("classifyImage", () => {
     ).toBe("meaningful");
   });
 
+  it("keeps large unlabelled article images", () => {
+    expect(
+      classifyImage({
+        url: "https://cdn.example.net/cover.jpg",
+        source: "img-src",
+        width: 1200,
+        height: 800
+      }).classification
+    ).toBe("meaningful");
+  });
+
+  it("classifies full-page filename graphics as decorative", () => {
+    expect(
+      classifyImage({
+        url: "https://www.sec.gov/Archives/edgar/data/1/casestudy-example.jpg",
+        source: "img-src",
+        alt: "casestudy-example.jpg",
+        width: 768,
+        height: 900
+      }).classification
+    ).toBe("decorative");
+  });
+
   it("classifies small unlabelled images as decorative", () => {
     expect(
       classifyImage({

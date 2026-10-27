@@ -1,30 +1,63 @@
-# Privacy Policy Draft
+# Privacy Policy
 
-Article to EPUB processes the active page only after the user clicks the extension action.
+**Article to EPUB**  
+Effective date: October 27, 2026
 
-## Data Processed Locally
+Article to EPUB is a browser extension that converts the active web page into an EPUB file on your computer. This policy describes what the extension handles and what it does not do.
 
-- Article HTML snapshots and selected text.
-- Metadata candidates such as title, author, publication date, source, and canonical URL.
-- Image URLs and image bytes selected for EPUB generation.
-- Generated EPUB files.
+## Who this applies to
 
-## Local Storage
+This policy covers the Article to EPUB Chrome extension. It does not cover Amazon, the Chrome Web Store, or the websites you choose to capture.
 
-The MVP uses `chrome.storage.local` for preferences, optional Kindle email handoff targets entered by the user, Kindle profile selection, image mode defaults, and same-site metadata correction rules. It does not use `chrome.storage.sync`.
+Contact: [GitHub issues for CRMV/article-to-epub](https://github.com/CRMV/article-to-epub/issues).
 
-Stored data must not include Amazon passwords, Amazon cookies, generated EPUB files, article bodies, or full reading-history URLs.
+## What the extension processes
 
-Remembered metadata corrections are local rules scoped to a site or normalized path prefix. They store the corrected field and value, but not the article body, selected text, or query-string URL.
+After you click the extension, it reads the active tab so it can build a preview and an EPUB. That local processing can include:
 
-## Compatibility Kits
+- The page URL, title, and HTML needed to extract the article
+- Text you have selected, if you capture a selection
+- Metadata candidates such as title, author, date, source, and canonical URL
+- Image URLs and, if you choose to include images, the image bytes needed for the EPUB
+- The EPUB file generated from that capture
 
-Compatibility kit export is user-initiated. The exported JSON is built from an allowlist of diagnostic summaries: extension version, snapshot mode, redacted hosts, warning codes, image counts, stage timings, route/image settings, and optional profile or recipe identifiers. It does not include article HTML, selected text, full URLs, Kindle email addresses, or raw metadata values by default.
+This processing happens in the extension on your device. Article content is not uploaded to the developer.
 
-## Network and Telemetry
+## What is stored on your device
 
-The MVP has no analytics, no remote crash reporting, no backend, and no automatic diagnostic upload. Optional image-host access is checked in preview without prompting and requested only from an explicit user action such as Generate EPUB.
+The extension uses `chrome.storage.local` for settings you choose to keep:
+
+- Image mode, delivery route, and selected Kindle profile
+- An optional Send to Kindle email address, only if you type one in
+- Metadata correction rules for a site or path, storing the corrected field and value
+
+It does not use `chrome.storage.sync`. Stored data does not include Amazon passwords, Amazon cookies, generated EPUB files, article bodies, or a browsing-history list.
+
+A captured page snapshot can remain in `chrome.storage.session` until you capture another page or the browser session ends. Session storage stays on the device.
+
+## What is not collected
+
+The extension has no account, no backend, no analytics, no advertising, and no remote crash reporting. It does not sell data. It does not use data for credit, lending, or interest-based ads. It does not send article HTML, selected text, metadata, or EPUB files to the developer.
+
+Optional image-host access is requested only from an explicit action such as Generate EPUB, and only for image origins that are not the page you captured. The extension removes those optional host grants after that conversion attempt.
+
+## Permissions
+
+- **activeTab** reads the current page only after you click the extension.
+- **scripting** runs the snapshot in that tab after the click.
+- **sidePanel** shows the preview and export controls.
+- **storage** keeps the local settings described above.
+- **downloads** saves the EPUB you generate.
+- **Optional host access** fetches cross-origin images you chose to include. It is not used to browse other sites.
+
+## EPUB files you send yourself
+
+Downloading an EPUB, uploading it on Amazon's Send to Kindle page, or attaching it to an email is something you do. Those services have their own privacy policies. Article to EPUB does not sign in to Amazon, read Amazon cookies, or call private Amazon delivery endpoints.
 
 ## Amazon
 
-Article to EPUB is not affiliated with Amazon. The extension does not automate Amazon login, access Amazon cookies, scrape account pages, or call private Amazon delivery endpoints.
+Article to EPUB is not affiliated with Amazon.
+
+## Changes
+
+If this policy changes, the updated version will replace this page and the effective date above will change.
