@@ -44,9 +44,21 @@ export function buildConversionReport(decisions: AssetDecision[], route: Deliver
 
 export function redactedHost(rawUrl: string): string {
   try {
-    return new URL(rawUrl).hostname;
+    const hostname = new URL(rawUrl).hostname;
+    return isPrivateHost(hostname) ? "private-host" : hostname;
   } catch {
     return "invalid-url";
   }
 }
 
+function isPrivateHost(hostname: string): boolean {
+  const lower = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (lower === "localhost" || lower.endsWith(".localhost")) return true;
+  if (lower.endsWith(".local") || lower.endsWith(".lan") || lower.endsWith(".home.arpa")) return true;
+  if (!lower.includes(".") && lower !== "::1") return true;
+  if (lower === "127.0.0.1" || lower === "::1") return true;
+  const parts = lower.split(".").map((part) => Number.parseInt(part, 10));
+  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part))) return false;
+  const [a, b] = parts as [number, number, number, number];
+  return a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a === 127 || a === 169 && b === 254;
+}

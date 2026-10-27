@@ -7,6 +7,7 @@ export type AssetSkipReason =
   | "decorative"
   | "unsupported-type"
   | "unsafe"
+  | "recipe-excluded"
   | "size-budget"
   | "fetch-failed"
   | "permission-denied";
@@ -32,6 +33,7 @@ export function planImageBudget(assets: ResolvedAsset[], mode: ImageMode, route:
   return assets.map((asset) => {
     if (asset.classification === "unsafe") return skip(asset, "unsafe");
     if (asset.classification === "unsupported") return skip(asset, "unsupported-type");
+    if (asset.recipeExcluded) return skip(asset, "recipe-excluded");
     if (asset.classification === "decorative") return skip(asset, "decorative");
     if (mode === "text-only") return skip(asset, "text-only");
     if (mode === "cover-only" && coverIncluded) return skip(asset, "mode-cover-only");

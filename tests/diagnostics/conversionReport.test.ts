@@ -15,6 +15,8 @@ function decision(url: string, include: boolean, reason?: AssetDecision["reason"
 describe("conversion report", () => {
   it("redacts URLs to hostnames", () => {
     expect(redactedHost("https://cdn.example.net/path/image.jpg?token=secret#frag")).toBe("cdn.example.net");
+    expect(redactedHost("https://nas.local/private.jpg")).toBe("private-host");
+    expect(redactedHost("https://192.168.1.3/private.jpg")).toBe("private-host");
   });
 
   it("reports counts and safe skip messages without query strings", () => {
@@ -25,9 +27,8 @@ describe("conversion report", () => {
 
     expect(report.includedImages).toBe(1);
     expect(report.skippedImages).toBe(1);
-    expect(report.hosts).toEqual(["127.0.0.1", "cdn.example.net"]);
+    expect(report.hosts).toEqual(["cdn.example.net", "private-host"]);
     expect(JSON.stringify(report)).not.toContain("token=secret");
     expect(report.warnings[0]?.code).toBe("image-skipped-unsafe");
   });
 });
-

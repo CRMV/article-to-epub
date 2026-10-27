@@ -49,15 +49,22 @@ export function unsafeReason(rawUrl: string): string | undefined {
 }
 
 function isLikelyDecorative(candidate: AssetCandidate): boolean {
-  const alt = candidate.alt?.trim();
+  const alt = candidate.alt?.trim() ?? "";
   const caption = candidate.caption?.trim();
+  const filenameAlt = /\.(avif|gif|jpe?g|png|webp|svg)$/i.test(alt);
+  const wide = (candidate.width ?? 0) >= 640;
+  const tall = (candidate.height ?? 0) >= 360;
+  if (filenameAlt && wide && tall) return true;
+
   const small = (candidate.width ?? 999) <= 80 || (candidate.height ?? 999) <= 80;
   return !alt && !caption && small;
 }
 
 function isLocalOrPrivateHost(hostname: string): boolean {
-  const lower = hostname.toLowerCase();
+  const lower = hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (lower === "localhost" || lower.endsWith(".localhost")) return true;
+  if (lower.endsWith(".local") || lower.endsWith(".lan") || lower.endsWith(".home.arpa")) return true;
+  if (!lower.includes(".") && lower !== "::1") return true;
   if (lower === "127.0.0.1" || lower === "::1") return true;
   const parts = lower.split(".").map((part) => Number.parseInt(part, 10));
   if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part))) return false;

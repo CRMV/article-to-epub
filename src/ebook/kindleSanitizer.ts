@@ -1,3 +1,6 @@
+import { promoteBulletParagraphs } from "../html/lists";
+import { promoteStyledSuperscripts } from "../html/superscript";
+import { meaningfulImageAlt, removeEmptyTables, stripUnsafeAttributes, unwrapObsoleteElements } from "../html/xhtmlPrep";
 import { serializeXhtmlChildren } from "./xhtmlSerializer";
 
 const REMOVE_SELECTORS = [
@@ -19,7 +22,9 @@ const REMOVE_SELECTORS = [
   "video",
   "audio",
   "svg",
-  "canvas"
+  "canvas",
+  "map",
+  "area"
 ];
 
 export function sanitizeForEpub(contentHtml: string, assetHrefByUrl = new Map<string, string>()): string {
@@ -31,14 +36,11 @@ export function sanitizeForEpub(contentHtml: string, assetHrefByUrl = new Map<st
     node.remove();
   }
 
-  for (const element of root.querySelectorAll<HTMLElement>("*")) {
-    for (const attribute of Array.from(element.attributes)) {
-      const name = attribute.name.toLowerCase();
-      if (name.startsWith("on") || name === "style") {
-        element.removeAttribute(attribute.name);
-      }
-    }
-  }
+  promoteStyledSuperscripts(root);
+  promoteBulletParagraphs(root);
+  stripUnsafeAttributes(root);
+  unwrapObsoleteElements(root);
+  removeEmptyTables(root);
 
   for (const image of root.querySelectorAll<HTMLImageElement>("img")) {
     const src = image.getAttribute("data-asset-url") ?? image.getAttribute("src") ?? "";
@@ -50,10 +52,14 @@ export function sanitizeForEpub(contentHtml: string, assetHrefByUrl = new Map<st
       continue;
     }
 
-    const alt = image.alt?.trim();
+    const alt = meaningfulImageAlt(image.alt);
+    if (!alt) {
+      image.remove();
+      continue;
+    }
     const replacement = doc.createElement("p");
     replacement.className = "image-skipped";
-    replacement.textContent = alt ? `Image skipped: ${alt}` : "Image skipped during conversion.";
+    replacement.textContent = `Image skipped: ${alt}`;
     image.replaceWith(replacement);
   }
 

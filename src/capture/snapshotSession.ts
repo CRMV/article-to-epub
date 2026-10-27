@@ -2,9 +2,9 @@ import type { PageSnapshot } from "../types";
 
 export const LATEST_SNAPSHOT_KEY = "latestPageSnapshot";
 
-export const CAPTURE_ACTIVE_TAB_REQUEST = "article-ferry:capture-active-tab";
-export const SNAPSHOT_READY_MESSAGE = "article-ferry:snapshot-ready";
-export const SNAPSHOT_ERROR_MESSAGE = "article-ferry:snapshot-error";
+export const CAPTURE_ACTIVE_TAB_REQUEST = "article-to-epub:capture-active-tab";
+export const SNAPSHOT_READY_MESSAGE = "article-to-epub:snapshot-ready";
+export const SNAPSHOT_ERROR_MESSAGE = "article-to-epub:snapshot-error";
 
 export interface SnapshotReadyMessage {
   type: typeof SNAPSHOT_READY_MESSAGE;

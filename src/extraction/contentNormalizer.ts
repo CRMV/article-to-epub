@@ -1,4 +1,7 @@
 import type { AssetCandidate } from "../types";
+import { promoteBulletParagraphs } from "../html/lists";
+import { promoteStyledSuperscripts } from "../html/superscript";
+import { captureImageDimensions, removeEmptyTables, stripUnsafeAttributes, unwrapObsoleteElements } from "../html/xhtmlPrep";
 
 const REMOVE_SELECTORS = [
   "script",
@@ -22,6 +25,8 @@ const REMOVE_SELECTORS = [
   "audio",
   "svg",
   "canvas",
+  "map",
+  "area",
   "nav",
   "footer",
   "[hidden]",
@@ -47,14 +52,12 @@ export function normalizeArticleHtml(html: string, baseUrl: string): Normalizati
     node.remove();
   }
 
-  for (const element of root.querySelectorAll<HTMLElement>("*")) {
-    for (const attribute of Array.from(element.attributes)) {
-      const name = attribute.name.toLowerCase();
-      if (name.startsWith("on") || name === "style" || name === "srcdoc" || name === "poster" || name === "background") {
-        element.removeAttribute(attribute.name);
-      }
-    }
-  }
+  captureImageDimensions(root);
+  promoteStyledSuperscripts(root);
+  promoteBulletParagraphs(root);
+  stripUnsafeAttributes(root);
+  unwrapObsoleteElements(root);
+  removeEmptyTables(root);
 
   const assets = collectImageCandidates(root, baseUrl);
   rewriteImageElements(root, baseUrl);
@@ -140,8 +143,11 @@ function sanitizeLinks(root: ParentNode, baseUrl: string): void {
 }
 
 function safeLinkHref(rawHref: string, baseUrl: string): string | undefined {
+  const trimmed = rawHref.trim();
+  if (trimmed.startsWith("#")) return trimmed;
+
   try {
-    const url = new URL(rawHref, baseUrl);
+    const url = new URL(trimmed, baseUrl);
     return url.protocol === "http:" || url.protocol === "https:" || url.protocol === "mailto:" ? url.toString() : undefined;
   } catch {
     return undefined;

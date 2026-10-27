@@ -1,6 +1,6 @@
 {
-  "name": "article-ferry",
-  "version": "0.1.0",
+  "name": "article-to-epub",
+  "version": "1.0.0",
   "description": "A local-first Chrome extension that converts article pages into Kindle-ready EPUB files.",
   "private": true,
   "type": "module",

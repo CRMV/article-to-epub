@@ -4,7 +4,7 @@ import {
   SNAPSHOT_READY_MESSAGE,
   saveLatestSnapshot
 } from "../src/capture/snapshotSession";
-import { requestCaptureAccess } from "../src/capture/pageAccess";
+import { hasCaptureAccess } from "../src/capture/pageAccess";
 import { collectPageSnapshot } from "../src/extraction/injectedSnapshot";
 import type { PageSnapshot } from "../src/types";
 
@@ -18,8 +18,8 @@ export default defineBackground(() => {
 
   chrome.action.onClicked.addListener((tab) => {
     if (!tab.id) return;
+    void captureTab(tab.id, tab.url, { activeTabGrant: true });
     void chrome.sidePanel.open({ tabId: tab.id }).catch(() => undefined);
-    void captureTab(tab.id, tab.url);
   });
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -34,7 +34,7 @@ async function captureActiveTab(): Promise<{ ok: true } | { ok: false; message: 
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     const tabId = tabs[0]?.id;
     if (!tabId) throw new Error("No active tab is available.");
-    await captureTab(tabId, tabs[0]?.url);
+    await captureTab(tabId, tabs[0]?.url, { activeTabGrant: false });
     return { ok: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not capture the active page.";
@@ -43,10 +43,11 @@ async function captureActiveTab(): Promise<{ ok: true } | { ok: false; message: 
   }
 }
 
-async function captureTab(tabId: number, url?: string): Promise<void> {
+async function captureTab(tabId: number, url: string | undefined, options: { activeTabGrant: boolean }): Promise<void> {
   try {
-    const granted = await requestCaptureAccess(url);
-    if (!granted) throw new Error("Article Ferry needs site access before it can capture this page.");
+    if (!options.activeTabGrant && !(await hasCaptureAccess(url))) {
+      throw new Error("Article to EPUB needs a fresh toolbar click before it can capture this page.");
+    }
     const results = (await chrome.scripting.executeScript({
       target: { tabId },
       func: collectPageSnapshot
@@ -69,7 +70,7 @@ async function publishCaptureError(message: string): Promise<void> {
   await chrome.runtime
     .sendMessage({
       type: SNAPSHOT_ERROR_MESSAGE,
-      message: `${message} Click the Article Ferry toolbar icon from the article tab to refresh access.`
+      message: `${message} Click the Article to EPUB toolbar icon from the article tab to refresh access.`
     })
     .catch(() => undefined);
 }

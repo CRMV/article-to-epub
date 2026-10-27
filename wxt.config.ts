@@ -3,12 +3,12 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    name: "Article Ferry",
-    short_name: "Article Ferry",
-    description: "Convert the current article page into a Kindle-ready EPUB file with local preview and metadata editing.",
-    version: "0.1.0",
+    name: "Article to EPUB",
+    short_name: "Article to EPUB",
+    description: "Send web articles to Kindle as EPUB with local preview, metadata editing, and image-aware size controls.",
+    version: "1.0.0",
     action: {
-      default_title: "Article Ferry"
+      default_title: "Article to EPUB"
     },
     permissions: ["activeTab", "scripting", "sidePanel", "storage", "downloads"],
     host_permissions: [],

@@ -3,6 +3,7 @@ import type { DeliveryRoute } from "../../types";
 export interface DeliveryPanelProps {
   route: DeliveryRoute;
   generatedFileName: string | undefined;
+  filenamePreview?: string | undefined;
   kindleEmail: string;
   onKindleEmailChange: (value: string) => void;
   onGenerate: () => void;
@@ -14,6 +15,7 @@ export interface DeliveryPanelProps {
 export function DeliveryPanel({
   route,
   generatedFileName,
+  filenamePreview,
   kindleEmail,
   onKindleEmailChange,
   onGenerate,
@@ -25,7 +27,7 @@ export function DeliveryPanel({
     <section className="delivery-panel" aria-labelledby="delivery-heading">
       <div>
         <h2 id="delivery-heading">Delivery</h2>
-        <p className="muted">{generatedFileName ? generatedFileName : "Generate an EPUB before handoff."}</p>
+        <p className="muted">{generatedFileName ?? filenamePreview ?? "Generate an EPUB before handoff."}</p>
       </div>
       {route === "email-handoff" ? (
         <label className="field compact-field">
@@ -38,7 +40,7 @@ export function DeliveryPanel({
           {busy ? "Generating..." : "Generate EPUB"}
         </button>
         {route === "amazon-web" ? (
-          <button type="button" onClick={onOpenAmazon} disabled={!generatedFileName}>
+          <button type="button" onClick={() => onOpenAmazon()} disabled={!generatedFileName}>
             Open upload
           </button>
         ) : null}

@@ -1,8 +1,8 @@
-# Article Ferry
+# Article to EPUB
 
-Article Ferry is a local-first Chrome extension that converts the current article page into a Kindle-ready EPUB file. It focuses on preview quality, editable metadata, image-aware size controls, and user-mediated handoff through Amazon-supported document routes.
+Article to EPUB is a local-first Chrome extension that converts the current article page into a Kindle-ready EPUB file. It focuses on preview quality, editable metadata, image-aware size controls, reusable Kindle profiles, and user-mediated handoff through Amazon-supported document routes.
 
-Article Ferry is not affiliated with Amazon. It does not automate Amazon login, use Amazon credentials, access Amazon cookies, or call private Amazon delivery endpoints.
+Article to EPUB is not affiliated with Amazon. It does not automate Amazon login, use Amazon credentials, access Amazon cookies, or call private Amazon delivery endpoints.
 
 ## Development
 
@@ -27,15 +27,15 @@ The verification command runs TypeScript, unit/component tests, and a Chrome MV3
 npm run zip
 ```
 
-The zip command creates a reproducible Chrome MV3 package from the current source tree.
+The zip command creates a reproducible Chrome MV3 package from the current source tree. Store listing text, permission justifications, and the privacy policy are in `docs/store-listing.md`, `docs/privacy.md`, and `docs/privacy.html`.
 
 ## Compatibility Reports
 
-Please use the compatibility issue template and avoid pasting full article bodies or private content. Short snippets, public URLs, screenshots, and conversion-report summaries are enough.
+Please use the compatibility issue template and avoid pasting full article bodies or private content. The side panel can export a sanitized compatibility kit with diagnostic summaries, redacted hosts, image counts, warning codes, and timing marks.
 
 ## Privacy Stance
 
-Article content is processed locally in the browser extension. The MVP has no analytics, no remote crash reporting, no backend, and no automatic diagnostic upload.
+Article content is processed locally in the browser extension. The MVP has no analytics, no remote crash reporting, no backend, and no automatic diagnostic upload. Remembered metadata corrections and Kindle profile choices are stored locally only.
 
 ## Manual Handoff
 

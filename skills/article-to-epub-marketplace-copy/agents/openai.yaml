@@ -1,0 +1,4 @@
+interface:
+  display_name: "Article to EPUB Marketplace Copy"
+  short_description: "Craft marketplace copy for Article to EPUB"
+  default_prompt: "Use $article-to-epub-marketplace-copy to draft polished marketplace descriptions for Article to EPUB."

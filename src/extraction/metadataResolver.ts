@@ -2,12 +2,15 @@ import type { MetadataCandidate, MetadataField, PageSnapshot, ResolvedMetadata }
 import { buildAuthorCandidates } from "./authorCandidates";
 import { buildDateCandidates } from "./dateCandidates";
 import { extractMetadataSources, firstMeta } from "./metadataSources";
+import { filingDisplayTitle, isGenericDocumentTitle } from "../html/filingCleanup";
+import { buildRecipeMetadataCandidates } from "./siteRecipes";
 
 const fields: MetadataField[] = ["title", "author", "source", "publishedDate", "language", "canonicalUrl"];
 
 export function resolveMetadata(snapshot: PageSnapshot): ResolvedMetadata {
   const sources = extractMetadataSources(snapshot);
-  const titleCandidates = buildTitleCandidates(snapshot, sources.title);
+  const recipeCandidates = buildRecipeMetadataCandidates(snapshot, sources.document);
+  const titleCandidates = buildTitleCandidates(snapshot, sources.document, sources.title);
   const authorCandidates = buildAuthorCandidates(sources);
   const dateCandidates = buildDateCandidates(sources);
   const sourceCandidates = buildSourceCandidates(snapshot, firstMeta(sources.meta, "og:site_name", "application-name"));
@@ -15,10 +18,10 @@ export function resolveMetadata(snapshot: PageSnapshot): ResolvedMetadata {
   const canonicalCandidates = buildSimpleCandidates("canonicalUrl", sources.canonicalUrl ?? snapshot.url, "canonical URL", 0.76);
 
   const candidates: Record<MetadataField, MetadataCandidate[]> = {
-    title: titleCandidates,
-    author: authorCandidates,
-    source: sourceCandidates,
-    publishedDate: dateCandidates,
+    title: mergeCandidates("title", titleCandidates, recipeCandidates),
+    author: mergeCandidates("author", authorCandidates, recipeCandidates),
+    source: mergeCandidates("source", sourceCandidates, recipeCandidates),
+    publishedDate: mergeCandidates("publishedDate", dateCandidates, recipeCandidates),
     language: languageCandidates,
     canonicalUrl: canonicalCandidates
   };
@@ -44,12 +47,22 @@ export function resolveMetadata(snapshot: PageSnapshot): ResolvedMetadata {
   };
 }
 
-function buildTitleCandidates(snapshot: PageSnapshot, documentTitle: string): MetadataCandidate[] {
+function mergeCandidates(
+  field: MetadataField,
+  normalCandidates: MetadataCandidate[],
+  recipeCandidates: MetadataCandidate[]
+): MetadataCandidate[] {
+  return dedupe([...recipeCandidates.filter((candidate) => candidate.field === field), ...normalCandidates]);
+}
+
+function buildTitleCandidates(snapshot: PageSnapshot, document: Document, documentTitle: string): MetadataCandidate[] {
+  const filingTitle = isGenericDocumentTitle(documentTitle) ? filingDisplayTitle(document) : undefined;
   const values = [
+    ...(filingTitle ? [{ value: filingTitle, source: "filing registrant", confidence: 0.93 }] : []),
     { value: documentTitle, source: "document title", confidence: 0.78 },
     { value: snapshot.title, source: "tab title", confidence: 0.62 }
   ];
-  return dedupe(values.map(({ value, source, confidence }) => ({ field: "title", value: value.trim(), source, confidence })));
+  return dedupe(values.map(({ value, source, confidence }) => ({ field: "title" as const, value: value.trim(), source, confidence })));
 }
 
 function buildSourceCandidates(snapshot: PageSnapshot, siteName?: string): MetadataCandidate[] {

@@ -1,5 +1,3 @@
-export const FALLBACK_CAPTURE_ORIGIN = "https://*/*";
-
 export function captureOriginPatternFromUrl(rawUrl?: string): string | undefined {
   if (!rawUrl) return undefined;
 
@@ -11,9 +9,9 @@ export function captureOriginPatternFromUrl(rawUrl?: string): string | undefined
   }
 }
 
-export async function requestCaptureAccess(rawUrl?: string): Promise<boolean> {
-  const origin = captureOriginPatternFromUrl(rawUrl) ?? FALLBACK_CAPTURE_ORIGIN;
-  const permissions = { origins: [origin] };
-  if (await chrome.permissions.contains(permissions)) return true;
-  return chrome.permissions.request(permissions);
+export async function hasCaptureAccess(rawUrl?: string): Promise<boolean> {
+  const origin = captureOriginPatternFromUrl(rawUrl);
+  if (!origin) return false;
+
+  return chrome.permissions.contains({ origins: [origin] });
 }
